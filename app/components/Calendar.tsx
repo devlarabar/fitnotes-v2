@@ -14,7 +14,7 @@ const MONTHS = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-export function Calendar() {
+export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const { workouts, loading, getWorkoutDates, refetch } = useWorkoutHistory();
   const { exercises, weightUnits, distanceUnits } = useWorkout();

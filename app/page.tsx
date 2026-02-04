@@ -7,11 +7,11 @@ import { SettingsPage } from '@/app/components/SettingsPage';
 import { Sidebar, MobileNav } from '@/app/components/Navigation';
 import { AnimatePresence, motion } from 'motion/react';
 
-const Calendar = dynamic(() => import('@/app/components/Calendar').then(mod => ({ default: mod.Calendar })), {
+const Calendar = dynamic(() => import('@/app/components/Calendar'), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center py-20">
-      <div className="w-12 h-12 border-4 border-brand-violet border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-12 h-12 border-4 border-accent-primary border-t-transparent rounded-full animate-spin"></div>
     </div>
   )
 });
