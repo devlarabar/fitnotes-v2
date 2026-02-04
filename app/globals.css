@@ -80,6 +80,25 @@
   --sidebar-ring: oklch(0.439 0 0);
 }
 
+@theme {
+  --color-bg-primary: #020617;
+  --color-bg-secondary: #0f172a;
+  --color-bg-tertiary: #1e293b;
+  --color-border-primary: #1e293b;
+  --color-border-secondary: #0f172a;
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
+  --color-text-dim: #64748b;
+  --color-text-subtle: #475569;
+  --color-text-faint: #334155;
+  --color-accent-primary: #8b5cf6;
+  --color-accent-secondary: #a78bfa;
+  --color-accent-pink: #ec4899;
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+}
+
 @layer base {
   * {
     border-color: hsl(var(--border));
