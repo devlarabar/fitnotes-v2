@@ -119,7 +119,7 @@ export function WorkoutDayView({
       )}
 
       <div className="space-y-4">
-        {groupedWorkouts.map((group) => {
+        {groupedWorkouts.filter(group => group.sets.length > 0).map((group) => {
           const exerciseData = exercises.find(e => e.id === group.exercise.id);
           const measurementType = exerciseData?.measurement_type?.name;
 

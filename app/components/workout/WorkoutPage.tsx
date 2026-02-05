@@ -6,30 +6,26 @@ import { CategorySelector } from '@/app/components/CategorySelector';
 import { ExerciseSelectorWithSupabase } from '@/app/components/ExerciseSelectorWithSupabase';
 import { useWorkout } from '@/app/hooks/useWorkout';
 import { useWorkoutHistory } from '@/app/hooks/useWorkoutHistory';
-import { Category } from '@/app/lib/schema';
-import { toast } from 'sonner';
+import { Category, Exercise } from '@/app/lib/schema';
 import { DayNavigation } from './DayNavigation';
 import { DayWorkouts } from './DayWorkouts';
-import { CurrentWorkout } from './CurrentWorkout';
+import { ExerciseTracker } from './ExerciseTracker';
+import { Plus } from 'lucide-react';
+import { Button } from '@/app/components/ui';
 
 export function WorkoutPage() {
   const [isCategorySelectorOpen, setIsCategorySelectorOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [viewDate, setViewDate] = useState(new Date());
+  const [trackingExercise, setTrackingExercise] = useState<Exercise | null>(null);
 
   const {
-    currentWorkout,
     exercises,
     categories,
     weightUnits,
     distanceUnits,
     loading,
-    addExercise,
-    removeExercise,
-    updateSet,
-    addSet,
-    removeSet,
-    finishWorkout
+    saveSetToSupabase
   } = useWorkout();
 
   const { workouts, refetch: refetchHistory } = useWorkoutHistory();
@@ -78,17 +74,6 @@ export function WorkoutPage() {
     setViewDate(new Date());
   };
 
-  const handleFinish = async () => {
-    const success = await finishWorkout();
-    if (success) {
-      toast.success("Workout saved to Supabase");
-      refetchHistory();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      toast.error("Add at least one exercise to finish session");
-    }
-  };
-
   const handleOpenSelector = () => {
     setIsCategorySelectorOpen(true);
   };
@@ -96,6 +81,23 @@ export function WorkoutPage() {
   const isToday = viewDate.toDateString() === new Date().toDateString();
   const viewDateStr = formatDate(viewDate);
   const hasWorkoutsForDay = getGroupedWorkouts(viewDateStr).length > 0;
+
+  // If tracking a specific exercise, show the tracker
+  if (trackingExercise) {
+    return (
+      <ExerciseTracker
+        exercise={trackingExercise}
+        date={viewDate}
+        weightUnits={weightUnits}
+        distanceUnits={distanceUnits}
+        onSaveSet={saveSetToSupabase}
+        onBack={() => {
+          setTrackingExercise(null);
+          refetchHistory();
+        }}
+      />
+    );
+  }
 
   if (loading) {
     return (
@@ -126,20 +128,13 @@ export function WorkoutPage() {
         showEmptyState={!hasWorkoutsForDay}
       />
 
-      {isToday && (
-        <CurrentWorkout
-          currentWorkout={currentWorkout}
-          exercises={exercises}
-          weightUnits={weightUnits}
-          distanceUnits={distanceUnits}
-          hasWorkoutsForDay={hasWorkoutsForDay}
-          onAddSet={addSet}
-          onUpdateSet={updateSet}
-          onRemoveSet={removeSet}
-          onRemoveExercise={removeExercise}
-          onOpenSelector={handleOpenSelector}
-          onFinish={handleFinish}
-        />
+      {/* Add exercise button - always show if there are workouts */}
+      {hasWorkoutsForDay && (
+        <div className="flex justify-center">
+          <Button variant="primary" onClick={handleOpenSelector} className="w-14 h-14 rounded-full">
+            <Plus size={24} />
+          </Button>
+        </div>
       )}
 
       <AnimatePresence>
@@ -160,9 +155,9 @@ export function WorkoutPage() {
               setSelectedCategory(null);
             }}
             onSelect={(ex) => {
-              addExercise(ex);
               setIsCategorySelectorOpen(false);
               setSelectedCategory(null);
+              setTrackingExercise(ex);
             }}
           />
         )}

@@ -33,19 +33,27 @@ export function DayWorkouts({
   onOpenSelector,
   showEmptyState = false
 }: Props) {
-  if (groupedWorkouts.length === 0) {
-    if (!showEmptyState) return null;
-    
+  console.log('DayWorkouts render:', { 
+    groupedWorkoutsLength: groupedWorkouts.length, 
+    showEmptyState, 
+    hasOnOpenSelector: !!onOpenSelector 
+  });
+
+  if (groupedWorkouts.length === 0 && showEmptyState) {
+    console.log('Rendering empty state with button');
     return (
       <Card className="py-20 flex flex-col items-center justify-center text-center border-dashed border-2 bg-transparent">
         <p className="text-text-muted max-w-[200px]">No workouts recorded for this day</p>
-        {onOpenSelector && (
-          <Button variant="secondary" onClick={onOpenSelector} className="mt-6">
-            Browse Exercises
-          </Button>
-        )}
+        <Button variant="secondary" onClick={onOpenSelector} className="mt-6">
+          Browse Exercises
+        </Button>
       </Card>
     );
+  }
+
+  if (groupedWorkouts.length === 0) {
+    console.log('No workouts, not showing empty state');
+    return null;
   }
 
   return (

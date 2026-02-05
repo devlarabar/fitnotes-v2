@@ -27,14 +27,7 @@ interface LocalWorkout {
   exercises: LocalWorkoutExercise[];
 }
 
-const STORAGE_KEY = 'fitnotes_current_workout';
-
 export function useWorkout() {
-  const [currentWorkout, setCurrentWorkout] = useState<LocalWorkout>({
-    id: Math.random().toString(36).substr(2, 9),
-    date: new Date().toISOString(),
-    exercises: [],
-  });
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [weightUnits, setWeightUnits] = useState<WeightUnit[]>([]);
@@ -45,27 +38,6 @@ export function useWorkout() {
   useEffect(() => {
     fetchData();
   }, []);
-
-  // Load current workout from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const c = JSON.parse(saved);
-        const isToday = new Date(c.date).toDateString() === new Date().toDateString();
-        if (isToday) {
-          setCurrentWorkout(c);
-        }
-      } catch (e) {
-        console.error("Storage error", e);
-      }
-    }
-  }, []);
-
-  // Save current workout to localStorage
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentWorkout));
-  }, [currentWorkout]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -155,132 +127,54 @@ export function useWorkout() {
     }
   };
 
-  const addExercise = (exercise: Exercise) => {
-    const newEx: LocalWorkoutExercise = {
-      id: Math.random().toString(36).substr(2, 9),
-      exerciseId: exercise.id,
-      sets: [{
-        id: Math.random().toString(36).substr(2, 9),
-        weight: 0,
-        weight_unit: weightUnits[0]?.id || 1,
-        reps: 0,
-        distance: 0,
-        distance_unit: distanceUnits[0]?.id || 1,
-        time: '00:00',
-        timestamp: Date.now()
-      }]
-    };
-    setCurrentWorkout(prev => ({ ...prev, exercises: [...prev.exercises, newEx] }));
-  };
-
-  const removeExercise = (id: string) => {
-    setCurrentWorkout(prev => ({ ...prev, exercises: prev.exercises.filter(ex => ex.id !== id) }));
-  };
-
-  const updateSet = (exerciseId: string, setId: string, updates: Partial<LocalSet>) => {
-    setCurrentWorkout(prev => ({
-      ...prev,
-      exercises: prev.exercises.map(ex => {
-        if (ex.id !== exerciseId) return ex;
-        return {
-          ...ex,
-          sets: ex.sets.map(s => s.id === setId ? { ...s, ...updates } : s)
-        };
-      })
-    }));
-  };
-
-  const addSet = (exerciseId: string) => {
-    setCurrentWorkout(prev => ({
-      ...prev,
-      exercises: prev.exercises.map(ex => {
-        if (ex.id !== exerciseId) return ex;
-        const last = ex.sets[ex.sets.length - 1];
-        return {
-          ...ex,
-          sets: [...ex.sets, {
-            id: Math.random().toString(36).substr(2, 9),
-            weight: last?.weight || 0,
-            weight_unit: last?.weight_unit || weightUnits[0]?.id || 1,
-            reps: last?.reps || 0,
-            distance: last?.distance || 0,
-            distance_unit: last?.distance_unit || distanceUnits[0]?.id || 1,
-            time: last?.time || '00:00',
-            timestamp: Date.now()
-          }]
-        };
-      })
-    }));
-  };
-
-  const removeSet = (exerciseId: string, setId: string) => {
-    setCurrentWorkout(prev => ({
-      ...prev,
-      exercises: prev.exercises.map(ex => {
-        if (ex.id !== exerciseId) return ex;
-        return { ...ex, sets: ex.sets.filter(s => s.id !== setId) };
-      })
-    }));
-  };
-
-  const finishWorkout = async () => {
-    if (currentWorkout.exercises.length === 0) return false;
-
+  const saveSetToSupabase = async (
+    exerciseId: number,
+    categoryId: number,
+    set: LocalSet,
+    date: Date
+  ): Promise<number | null> => {
     try {
-      const date = new Date(currentWorkout.date).toISOString().split('T')[0];
-      
-      for (const exercise of currentWorkout.exercises) {
-        const exerciseData = exercises.find(e => e.id === exercise.exerciseId);
-        if (!exerciseData) continue;
+      const dateStr = formatDate(date);
+      const workoutData: WorkoutData = {
+        date: dateStr,
+        exercise: exerciseId,
+        category: categoryId,
+        weight: set.weight || null,
+        weight_unit: set.weight_unit || null,
+        reps: set.reps || null,
+        distance: set.distance || null,
+        distance_unit: set.distance_unit || null,
+        time: set.time || null,
+        comment: null
+      };
 
-        for (const set of exercise.sets) {
-          const workoutData: WorkoutData = {
-            date,
-            exercise: exercise.exerciseId,
-            category: exerciseData.category || 1,
-            weight: set.weight || null,
-            weight_unit: set.weight_unit || null,
-            reps: set.reps || null,
-            distance: set.distance || null,
-            distance_unit: set.distance_unit || null,
-            time: set.time || null,
-            comment: null
-          };
+      const { data, error } = await supabase
+        .from('workouts')
+        .insert([workoutData])
+        .select('id')
+        .single();
 
-          const { error } = await supabase
-            .from('workouts')
-            .insert([workoutData]);
-
-          if (error) throw error;
-        }
-      }
-
-      setCurrentWorkout({
-        id: Math.random().toString(36).substr(2, 9),
-        date: new Date().toISOString(),
-        exercises: [],
-      });
-      localStorage.removeItem(STORAGE_KEY);
-
-      return true;
+      if (error) throw error;
+      return data.id;
     } catch (err) {
-      console.error('Error saving workout:', err);
-      return false;
+      console.error('Error saving set:', err);
+      return null;
     }
   };
 
+  const formatDate = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   return {
-    currentWorkout,
     exercises,
     categories,
     weightUnits,
     distanceUnits,
     loading,
-    addExercise,
-    removeExercise,
-    updateSet,
-    addSet,
-    removeSet,
-    finishWorkout
+    saveSetToSupabase
   };
 }
