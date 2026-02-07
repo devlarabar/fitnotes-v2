@@ -57,38 +57,58 @@ export function SetForm({
         />
       </div>
 
-      <div className="flex gap-2">
-        {isEditing && onCancel && (
+      <div className="grid grid-cols-2 gap-2">
+        {isEditing && onCancel ? (
+          <>
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={onCancel}
+              disabled={saving}
+            >
+              <X size={18} />
+              Cancel
+            </Button>
+            <Button
+              variant="accent"
+              size="lg"
+              onClick={onSave}
+              disabled={saving}
+            >
+              {saving ? (
+                <>
+                  <SpinnerInline />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save size={18} />
+                  Update Set
+                </>
+              )}
+            </Button>
+          </>
+        ) : (
           <Button
-            variant="ghost"
+            variant="accent"
             size="lg"
-            onClick={onCancel}
+            onClick={onSave}
             disabled={saving}
-            className="flex-1"
+            className="col-span-2"
           >
-            <X size={18} />
-            Cancel
+            {saving ? (
+              <>
+                <SpinnerInline />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save size={18} />
+                Save Set
+              </>
+            )}
           </Button>
         )}
-        <Button
-          variant="accent"
-          size="lg"
-          onClick={onSave}
-          disabled={saving}
-          className={isEditing ? 'flex-1' : 'w-full'}
-        >
-          {saving ? (
-            <>
-              <SpinnerInline />
-              Saving...
-            </>
-          ) : (
-            <>
-              <Save size={18} />
-              {isEditing ? 'Update Set' : 'Save Set'}
-            </>
-          )}
-        </Button>
       </div>
     </div>
   );
