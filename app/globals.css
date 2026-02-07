@@ -100,24 +100,24 @@
   --color-danger: #ef4444;
 }
 
-/* Light Mode Override */
+/* Light Mode Override - Soft purple/blue palette */
 :root:not(.dark) {
-  --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f9fafb;
-  --color-bg-tertiary: #f3f4f6;
-  --color-border-primary: #e5e7eb;
-  --color-border-secondary: #f3f4f6;
-  --color-text-primary: #111827;
-  --color-text-secondary: #374151;
-  --color-text-muted: #6b7280;
-  --color-text-dim: #9ca3af;
-  --color-text-subtle: #d1d5db;
-  --color-text-faint: #e5e7eb;
-  --color-accent-primary: #8b5cf6;
-  --color-accent-secondary: #a78bfa;
-  --color-accent-pink: #ec4899;
-  --color-success: #10b981;
-  --color-danger: #ef4444;
+  --color-bg-primary: #faf8ff;      /* Very soft purple-white */
+  --color-bg-secondary: #f3f0ff;    /* Soft lavender */
+  --color-bg-tertiary: #ede9fe;     /* Light purple */
+  --color-border-primary: #ddd6fe;  /* Soft purple border */
+  --color-border-secondary: #e9e5ff; /* Lighter purple border */
+  --color-text-primary: #1e1b4b;    /* Deep indigo */
+  --color-text-secondary: #4c1d95;  /* Purple-900 */
+  --color-text-muted: #7c3aed;      /* Violet-600 */
+  --color-text-dim: #a78bfa;        /* Violet-400 */
+  --color-text-subtle: #c4b5fd;     /* Violet-300 */
+  --color-text-faint: #ddd6fe;      /* Violet-200 */
+  --color-accent-primary: #8b5cf6;  /* Violet-500 - keep same */
+  --color-accent-secondary: #a78bfa; /* Violet-400 - keep same */
+  --color-accent-pink: #ec4899;     /* Pink-500 - keep same */
+  --color-success: #10b981;         /* Emerald-500 - keep same */
+  --color-danger: #ef4444;          /* Red-500 - keep same */
 }
 
 @layer base {
