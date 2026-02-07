@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Trophy, MessageSquare } from 'lucide-react';
 import { supabase } from '@/app/lib/supabase';
 import { Workout } from '@/app/lib/schema';
-import { Spinner, SetNumberBadge } from '@/app/components/ui';
+import { SetNumberBadge } from '@/app/components/ui';
+import { CenteredSpinner } from '../ui/spinner';
 
 interface Props {
   exerciseId: number;
@@ -84,9 +85,7 @@ export function ExerciseHistory({ exerciseId }: Props) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-10">
-        <Spinner />
-      </div>
+      <CenteredSpinner />
     );
   }
 
@@ -103,11 +102,11 @@ export function ExerciseHistory({ exerciseId }: Props) {
       {groupedByDate.map((group) => (
         <div key={group.date} className="space-y-2">
           <h4 className="text-xs text-text-dim font-bold uppercase tracking-wider sticky top-0 bg-bg-secondary py-2">
-            {new Date(group.date).toLocaleDateString('en-US', { 
+            {new Date(group.date).toLocaleDateString('en-US', {
               weekday: 'short',
-              month: 'short', 
-              day: 'numeric', 
-              year: 'numeric' 
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric'
             })}
           </h4>
           <div className="space-y-2">

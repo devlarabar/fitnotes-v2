@@ -33,3 +33,12 @@ export function SpinnerInline({ className }: { className?: string }) {
     />
   );
 }
+
+
+export function CenteredSpinner({ size = 'md', className }: SpinnerProps) {
+  return (
+    <div className="flex items-center justify-center">
+      <Spinner size={size} className={className} />
+    </div>
+  );
+}
