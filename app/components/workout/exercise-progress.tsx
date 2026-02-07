@@ -96,23 +96,27 @@ export function ExerciseProgress({ exerciseId, measurementType }: Props) {
 
     // Distance exercises
     if (measurementType === 'distance') {
-      const maxDistance = Math.max(...history.map(s => s.distance || 0));
-      const maxDistanceSet = history.find(s => s.distance === maxDistance);
-      
       const timeToSeconds = (t: string): number => {
         const [mins, secs] = t.split(':').map(Number);
         return (mins || 0) * 60 + (secs || 0);
       };
 
-      const minTime = Math.min(
-        ...history.filter(s => s.time).map(s => timeToSeconds(s.time!))
-      );
+      // Find the longest distance
+      const maxDistance = Math.max(...history.map(s => s.distance || 0));
+      
+      // Of all sets at max distance, find the fastest time
+      const setsAtMaxDistance = history.filter(s => s.distance === maxDistance && s.time);
+      const bestSet = setsAtMaxDistance.reduce((best, current) => {
+        const bestTime = timeToSeconds(best.time!);
+        const currentTime = timeToSeconds(current.time!);
+        return currentTime < bestTime ? current : best;
+      }, setsAtMaxDistance[0]);
 
       return {
         type: 'distance' as const,
         maxDistance,
-        minTime,
-        unit: maxDistanceSet?.distance_units?.name || 'km'
+        bestTime: bestSet?.time ? timeToSeconds(bestSet.time) : 0,
+        unit: bestSet?.distance_units?.name || 'km'
       };
     }
 
@@ -235,9 +239,9 @@ export function ExerciseProgress({ exerciseId, measurementType }: Props) {
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-text-dim mb-1">Fastest Time</p>
+                  <p className="text-xs text-text-dim mb-1">Best Time</p>
                   <p className="text-3xl font-black text-white">
-                    {Math.floor((prStats.minTime || 0) / 60)}:{String((prStats.minTime || 0) % 60).padStart(2, '0')}
+                    {Math.floor((prStats.bestTime || 0) / 60)}:{String((prStats.bestTime || 0) % 60).padStart(2, '0')}
                   </p>
                 </div>
               </>
