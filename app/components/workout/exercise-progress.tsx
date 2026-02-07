@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp } from 'lucide-react';
+import { Trophy, Info } from 'lucide-react';
 import { supabase } from '@/app/lib/supabase';
 import { Workout } from '@/app/lib/schema';
 import { Button, Card, Spinner } from '../ui';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Tooltip as ChartTooltip, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { Tooltip, TooltipTrigger, TooltipContent } from '../ui/tooltip';
 
 interface Props {
   exerciseId: number;
@@ -82,15 +83,20 @@ export function ExerciseProgress({ exerciseId, measurementType }: Props) {
 
     // Weight/Reps exercises
     if (measurementType !== 'distance' && measurementType !== 'time') {
+      // Find the highest weight
       const maxWeight = Math.max(...history.map(s => s.weight || 0));
-      const maxWeightSet = history.find(s => s.weight === maxWeight);
-      const maxReps = Math.max(...history.map(s => s.reps || 0));
       
+      // Of all sets at max weight, find the most reps
+      const setsAtMaxWeight = history.filter(s => s.weight === maxWeight);
+      const bestSet = setsAtMaxWeight.reduce((best, current) => {
+        return (current.reps || 0) > (best.reps || 0) ? current : best;
+      }, setsAtMaxWeight[0]);
+
       return {
         type: 'weight' as const,
         maxWeight,
-        maxReps,
-        unit: maxWeightSet?.weight_units?.name || 'kg'
+        bestReps: bestSet?.reps || 0,
+        unit: bestSet?.weight_units?.name || 'kg'
       };
     }
 
@@ -207,7 +213,7 @@ export function ExerciseProgress({ exerciseId, measurementType }: Props) {
     <div className="space-y-6">
       {/* PR Stats */}
       {prStats && (
-        <Card className="p-6 bg-gradient-to-br from-violet-500/10 to-pink-500/10 border-violet-500/20">
+        <Card className="p-6 bg-linear-to-br from-violet-500/10 to-pink-500/10 border-violet-500/20">
           <div className="flex items-center gap-3 mb-4">
             <Trophy size={20} className="text-yellow-500" />
             <h3 className="text-sm font-bold text-text-secondary uppercase tracking-wider">
@@ -219,27 +225,67 @@ export function ExerciseProgress({ exerciseId, measurementType }: Props) {
             {prStats.type === 'weight' && (
               <>
                 <div>
-                  <p className="text-xs text-text-dim mb-1">Max Weight</p>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <p className="text-xs text-text-dim">Max Weight</p>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info size={12} className="text-text-dim hover:text-text-secondary" />
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-slate-800 text-white border border-slate-700">
+                        The heaviest weight you've lifted for this exercise
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                   <p className="text-3xl font-black text-white">
                     {prStats.maxWeight} <span className="text-lg text-violet-400">{prStats.unit}</span>
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-text-dim mb-1">Max Reps</p>
-                  <p className="text-3xl font-black text-white">{prStats.maxReps}</p>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <p className="text-xs text-text-dim">Best Reps</p>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info size={12} className="text-text-dim hover:text-text-secondary" />
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-slate-800 text-white border border-slate-700">
+                        Most reps completed at your max weight
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <p className="text-3xl font-black text-white">{prStats.bestReps}</p>
                 </div>
               </>
             )}
             {prStats.type === 'distance' && (
               <>
                 <div>
-                  <p className="text-xs text-text-dim mb-1">Longest Distance</p>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <p className="text-xs text-text-dim">Longest Distance</p>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info size={12} className="text-text-dim hover:text-text-secondary" />
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-slate-800 text-white border border-slate-700">
+                        The farthest distance you've covered
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                   <p className="text-3xl font-black text-white">
                     {prStats.maxDistance} <span className="text-lg text-violet-400">{prStats.unit}</span>
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-text-dim mb-1">Best Time</p>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <p className="text-xs text-text-dim">Best Time</p>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info size={12} className="text-text-dim hover:text-text-secondary" />
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-slate-800 text-white border border-slate-700">
+                        Fastest time at your longest distance
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                   <p className="text-3xl font-black text-white">
                     {Math.floor((prStats.bestTime || 0) / 60)}:{String((prStats.bestTime || 0) % 60).padStart(2, '0')}
                   </p>
@@ -248,7 +294,17 @@ export function ExerciseProgress({ exerciseId, measurementType }: Props) {
             )}
             {prStats.type === 'time' && (
               <div>
-                <p className="text-xs text-text-dim mb-1">Longest Time</p>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <p className="text-xs text-text-dim">Longest Time</p>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info size={12} className="text-text-dim hover:text-text-secondary" />
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-slate-800 text-white border border-slate-700">
+                      The longest duration you've held this exercise
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <p className="text-3xl font-black text-white">
                   {Math.floor((prStats.maxTime || 0) / 60)}:{String((prStats.maxTime || 0) % 60).padStart(2, '0')}
                 </p>
@@ -306,7 +362,7 @@ export function ExerciseProgress({ exerciseId, measurementType }: Props) {
                   stroke="#64748b"
                   tick={{ fill: '#64748b', fontSize: 12 }}
                 />
-                <Tooltip
+                <ChartTooltip
                   contentStyle={{
                     backgroundColor: '#1e293b',
                     border: '1px solid #334155',
@@ -335,7 +391,7 @@ export function ExerciseProgress({ exerciseId, measurementType }: Props) {
                   stroke="#64748b"
                   tick={{ fill: '#64748b', fontSize: 12 }}
                 />
-                <Tooltip
+                <ChartTooltip
                   contentStyle={{
                     backgroundColor: '#1e293b',
                     border: '1px solid #334155',
