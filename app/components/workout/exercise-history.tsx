@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
 import { supabase } from '@/app/lib/supabase';
 import { Workout } from '@/app/lib/schema';
 import { Button } from '@/app/components/ui';
@@ -33,6 +33,7 @@ export function ExerciseHistory({ exerciseId }: Props) {
           distance,
           distance_unit,
           time,
+          is_pr,
           weight_units(name),
           distance_units(name)
         `)
@@ -53,6 +54,7 @@ export function ExerciseHistory({ exerciseId }: Props) {
         distance: item.distance,
         distance_unit: item.distance_unit,
         time: item.time,
+        is_pr: item.is_pr,
         weight_units: item.weight_units ? { name: item.weight_units.name } : undefined,
         distance_units: item.distance_units ? { name: item.distance_units.name } : undefined
       }));
@@ -131,22 +133,27 @@ export function ExerciseHistory({ exerciseId }: Props) {
                 {new Date(set.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
             </div>
-            <div className="flex gap-3 text-sm">
-              {set.weight !== null && set.weight !== undefined && (
-                <span className="font-bold text-accent-secondary">
-                  {set.weight} {set.weight_units?.name}
-                </span>
-              )}
-              {set.reps !== null && set.reps !== undefined && (
-                <span className="text-text-secondary">{set.reps} reps</span>
-              )}
-              {set.distance !== null && set.distance !== undefined && (
-                <span className="font-bold text-accent-secondary">
-                  {set.distance} {set.distance_units?.name}
-                </span>
-              )}
-              {set.time && (
-                <span className="text-text-secondary">{set.time}</span>
+            <div className="flex items-center gap-3 text-sm">
+              <div className="flex gap-3">
+                {set.weight !== null && set.weight !== undefined && (
+                  <span className="font-bold text-accent-secondary">
+                    {set.weight} {set.weight_units?.name}
+                  </span>
+                )}
+                {set.reps !== null && set.reps !== undefined && (
+                  <span className="text-text-secondary">{set.reps} reps</span>
+                )}
+                {set.distance !== null && set.distance !== undefined && (
+                  <span className="font-bold text-accent-secondary">
+                    {set.distance} {set.distance_units?.name}
+                  </span>
+                )}
+                {set.time && (
+                  <span className="text-text-secondary">{set.time}</span>
+                )}
+              </div>
+              {set.is_pr && (
+                <Trophy size={16} className="text-yellow-500" />
               )}
             </div>
           </div>

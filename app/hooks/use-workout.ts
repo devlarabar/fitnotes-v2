@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/app/lib/supabase';
 import { Exercise, WeightUnit, DistanceUnit, WorkoutData, Category } from '@/app/lib/schema';
+import { checkIsPR } from '@/app/lib/pr-checker';
 
 interface LocalSet {
   id: string;
@@ -135,6 +136,16 @@ export function useWorkout() {
   ): Promise<number | null> => {
     try {
       const dateStr = formatDate(date);
+      
+      // Check if this is a PR
+      const isPR = await checkIsPR(
+        exerciseId,
+        set.weight,
+        set.reps,
+        set.distance,
+        set.time
+      );
+
       const workoutData: WorkoutData = {
         date: dateStr,
         exercise: exerciseId,
@@ -145,7 +156,8 @@ export function useWorkout() {
         distance: set.distance || null,
         distance_unit: set.distance_unit || null,
         time: set.time || null,
-        comment: null
+        comment: null,
+        is_pr: isPR
       };
 
       const { data, error } = await supabase

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dumbbell, Trash2, Save, X } from 'lucide-react';
+import { Dumbbell, Trash2, Save, X, Trophy } from 'lucide-react';
 import { Workout, Exercise, WeightUnit, DistanceUnit } from '@/app/lib/schema';
 import { Button, Card } from './ui';
 import { SetInputs } from './set-inputs';
@@ -211,6 +211,9 @@ export function WorkoutDayView({
                               <span className="text-slate-300">{set.time}</span>
                             )}
                           </div>
+                          {set.is_pr && (
+                            <Trophy size={16} className="text-yellow-500" />
+                          )}
                           <Button
                             variant="ghost"
                             onClick={(e) => {

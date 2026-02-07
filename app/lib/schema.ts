@@ -41,6 +41,7 @@ export interface Workout {
   distance_unit?: number
   time?: string
   comment?: string
+  is_pr?: boolean
   exercises?: { name: string }
   categories?: { name: string }
   weight_units?: { name: string }
@@ -58,6 +59,7 @@ export interface WorkoutData {
   distance_unit?: number | null
   time?: string | null
   comment?: string | null
+  is_pr?: boolean | null
 }
 
 export interface GroupedWorkout {
