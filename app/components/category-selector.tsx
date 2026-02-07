@@ -2,7 +2,7 @@ import React from 'react';
 import { X, ChevronRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Category } from '@/app/lib/schema';
-import { Button, Card } from './ui';
+import { Button, Card, IconContainer } from './ui';
 
 interface Props {
   categories: Category[];
@@ -33,9 +33,9 @@ export function CategorySelector({ categories, onSelect, onClose }: Props) {
             className="flex items-center justify-between group hover:border-violet-500/30"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-violet-500/10 flex items-center justify-center text-violet-400 group-hover:bg-violet-500/20 transition-all text-2xl">
+              <IconContainer size="lg" className="group-hover:bg-violet-500/20 transition-all text-2xl">
                 {category.name.charAt(0)}
-              </div>
+              </IconContainer>
               <div>
                 <h3 className="font-bold text-white group-hover:text-violet-400 transition-colors text-lg">
                   {category.name}

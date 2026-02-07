@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Dumbbell, Trash2, Save, X, Trophy, ChevronRight, MessageSquare } from 'lucide-react';
 import { Workout, Exercise, WeightUnit, DistanceUnit } from '@/app/lib/schema';
-import { Button, Card } from './ui';
+import { Button, Card, SpinnerInline, SetNumberBadge, IconContainer } from './ui';
 import { Textarea } from './ui/form/textarea';
 import { SetInputs } from './set-inputs';
 import { supabase } from '@/app/lib/supabase';
@@ -133,9 +133,9 @@ export function WorkoutDayView({
                 className={`flex items-center gap-3 mb-3 ${onExerciseClick ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
                 onClick={() => onExerciseClick?.(group.exercise.id)}
               >
-                <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center text-violet-400">
+                <IconContainer>
                   <Dumbbell size={18} />
-                </div>
+                </IconContainer>
                 <div className="flex-1">
                   <h4 className="font-bold text-white">{group.exercise.name}</h4>
                   <p className="text-xs text-slate-500 uppercase tracking-wider">{group.exercise.category}</p>
@@ -185,13 +185,9 @@ export function WorkoutDayView({
                                 variant="primary"
                                 onClick={handleSaveSet}
                                 className="p-2 h-auto"
-                                disabled={saving}
-                              >
-                                {saving ? (
-                                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                ) : (
-                                  <Save size={16} />
-                                )}
+                              disabled={saving}
+                            >
+                              {saving ? <SpinnerInline /> : <Save size={16} />}
                               </Button>
                             </div>
                           </div>
@@ -209,9 +205,7 @@ export function WorkoutDayView({
                             className="flex items-center gap-3 p-2 cursor-pointer hover:bg-slate-900 transition-colors"
                             onClick={() => handleStartEdit(set)}
                           >
-                            <div className="w-6 h-6 rounded-lg bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-500">
-                              {idx + 1}
-                            </div>
+                            <SetNumberBadge number={idx + 1} className="bg-slate-800" />
                             <div className="flex-1 flex items-center gap-4 text-sm min-w-0">
                               <div className="flex gap-4">
                                 {set.weight !== null && set.weight !== undefined && (
