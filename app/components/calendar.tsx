@@ -118,14 +118,14 @@ export default function Calendar({ onDateSelect }: Props) {
             <ChevronLeft size={24} />
           </Button>
 
-          <div className="text-center">
+          <div className="text-center flex flex-col justify-center items-center">
             <h2 className="text-2xl font-black text-white">
               {MONTHS[month]} {year}
             </h2>
             <Button
               variant="ghost"
               onClick={goToToday}
-              className="text-xs text-slate-500 hover:text-violet-400 mt-1"
+              className="text-xs text-slate-500 hover:text-violet-400 mt-1 mx-auto"
             >
               Today
             </Button>
