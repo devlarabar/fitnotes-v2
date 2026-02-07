@@ -70,7 +70,8 @@ export function MobileNav({ activeTab, setActiveTab }: Props) {
           key={item.id}
           onClick={() => setActiveTab(item.id)}
           className={cn(
-            "flex flex-col items-center gap-1 p-2 rounded-2xl flex-1 transition-all duration-300",
+            `flex flex-col items-center gap-1 p-2 rounded-2xl flex-1 transition-all
+            duration-300 hover:cursor-pointer hover:text-accent-primary`,
             activeTab === item.id ? "text-accent-secondary" : "text-text-subtle"
           )}
         >
