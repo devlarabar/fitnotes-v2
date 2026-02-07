@@ -4,6 +4,7 @@ import React from 'react';
 import { Toaster } from 'sonner';
 import { ThemeProvider, useTheme } from '@/app/contexts/theme-context';
 import { UserProvider } from '@/app/contexts/user-context';
+import { WorkoutDataProvider } from '@/app/contexts/workout-data-context';
 
 function ThemedToaster() {
   const { theme } = useTheme();
@@ -30,8 +31,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
       <UserProvider>
-        <ThemedToaster />
-        {children}
+        <WorkoutDataProvider>
+          <ThemedToaster />
+          {children}
+        </WorkoutDataProvider>
       </UserProvider>
     </ThemeProvider>
   );

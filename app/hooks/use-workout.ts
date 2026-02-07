@@ -5,6 +5,7 @@ import { supabase } from '@/app/lib/supabase';
 import { Exercise, WeightUnit, DistanceUnit, WorkoutData, Category } from '@/app/lib/schema';
 import { checkIsPR } from '@/app/lib/pr-checker';
 import { useUser } from '@/app/contexts/user-context';
+import { useWorkoutData } from '@/app/contexts/workout-data-context';
 
 interface LocalSet {
   id: string;
@@ -31,6 +32,7 @@ interface LocalWorkout {
 
 export function useWorkout() {
   const { user } = useUser();
+  const { addWorkout: addWorkoutToCache, deleteWorkout: deleteWorkoutFromCache } = useWorkoutData();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [weightUnits, setWeightUnits] = useState<WeightUnit[]>([]);
@@ -167,14 +169,68 @@ export function useWorkout() {
         user_id: user.id
       };
 
-      const { data, error } = await supabase
-        .from('workouts')
-        .insert([workoutData])
-        .select('id')
-        .single();
+      // Optimistically add to cache with temporary ID
+      const tempWorkout = {
+        id: -Date.now(), // Temporary negative ID
+        date: workoutData.date,
+        exercise: workoutData.exercise,
+        category: workoutData.category,
+        weight: workoutData.weight || undefined,
+        weight_unit: workoutData.weight_unit || undefined,
+        reps: workoutData.reps || undefined,
+        distance: workoutData.distance || undefined,
+        distance_unit: workoutData.distance_unit || undefined,
+        time: workoutData.time || undefined,
+        comment: workoutData.comment || undefined,
+        is_pr: workoutData.is_pr || undefined,
+        user_id: user.id
+      };
+      addWorkoutToCache(tempWorkout);
 
-      if (error) throw error;
-      return data.id;
+      try {
+        const { data, error } = await supabase
+          .from('workouts')
+          .insert([workoutData])
+          .select(`
+            id, date, exercise, category, weight, weight_unit, reps,
+            distance, distance_unit, time, comment, is_pr,
+            exercises(name), categories(name), weight_units(name), distance_units(name)
+          `)
+          .single();
+
+        if (error) throw error;
+
+        // Replace temp workout with real one
+        const realWorkout = {
+          id: data.id,
+          date: data.date,
+          exercise: data.exercise,
+          category: data.category,
+          weight: data.weight,
+          weight_unit: data.weight_unit,
+          reps: data.reps,
+          distance: data.distance,
+          distance_unit: data.distance_unit,
+          time: data.time,
+          comment: data.comment,
+          is_pr: data.is_pr,
+          exercises: (data as any).exercises ? { name: (data as any).exercises.name } : undefined,
+          categories: (data as any).categories ? { name: (data as any).categories.name } : undefined,
+          weight_units: (data as any).weight_units ? { name: (data as any).weight_units.name } : undefined,
+          distance_units: (data as any).distance_units ? { name: (data as any).distance_units.name } : undefined,
+          user_id: user.id
+        };
+        
+        // Remove temp and add real
+        deleteWorkoutFromCache(tempWorkout.id);
+        addWorkoutToCache(realWorkout);
+
+        return data.id;
+      } catch (error) {
+        // Rollback: remove the temp workout
+        deleteWorkoutFromCache(tempWorkout.id);
+        throw error;
+      }
     } catch (err) {
       console.error('Error saving set:', err);
       return null;
