@@ -14,8 +14,13 @@ interface Props {
 
 export function DayComment({ date, initialComment, onUpdate }: Props) {
   const [isEditing, setIsEditing] = useState(false);
-  const [editValue, setEditValue] = useState(initialComment?.comment || '');
+  const [editValue, setEditValue] = useState('');
   const [saving, setSaving] = useState(false);
+
+  const handleStartEdit = () => {
+    setEditValue(initialComment?.comment || '');
+    setIsEditing(true);
+  };
 
   const handleSave = async () => {
     if (!editValue.trim()) {
@@ -84,7 +89,7 @@ export function DayComment({ date, initialComment, onUpdate }: Props) {
   };
 
   return (
-    <Card className="p-4 h-24 overflow-y-auto">
+    <Card className={`p-4 transition-all ${isEditing ? 'h-auto' : 'h-24'} overflow-y-auto`}>
       {isEditing ? (
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-sm font-bold text-text-secondary">
@@ -131,14 +136,14 @@ export function DayComment({ date, initialComment, onUpdate }: Props) {
       ) : initialComment ? (
         <div
           className="flex items-start gap-3 cursor-pointer h-full"
-          onClick={() => setIsEditing(true)}
+          onClick={handleStartEdit}
         >
           <MessageSquare size={16} className="text-text-dim mt-0.5 shrink-0" />
           <p className="flex-1 text-sm text-text-secondary italic">{initialComment.comment}</p>
         </div>
       ) : (
         <button
-          onClick={() => setIsEditing(true)}
+          onClick={handleStartEdit}
           className="w-full h-full flex items-center justify-center gap-2 text-text-dim hover:text-text-secondary transition-colors"
         >
           <MessageSquare size={16} />
