@@ -9,6 +9,7 @@ import { ExerciseProgress } from './exercise-progress';
 import { supabase } from '@/app/lib/supabase';
 import { toast } from 'sonner';
 import { useWorkout } from '@/app/hooks/use-workout';
+import { useUser } from '@/app/contexts/user-context';
 
 interface LocalSet {
   weight?: number;
@@ -33,6 +34,7 @@ interface Props {
 }
 
 export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
+  const { user } = useUser();
   const { weightUnits, distanceUnits } = useWorkout();
   const [activeTab, setActiveTab] = useState<'sets' | 'history' | 'progress'>('sets');
   const [currentSet, setCurrentSet] = useState<LocalSet>({
@@ -64,10 +66,13 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
 
   const fetchLastSetData = async () => {
     try {
+      if (!user?.id) return;
+
       const { data, error } = await supabase
         .from('workouts')
         .select('weight, weight_unit, reps, distance, distance_unit, time')
         .eq('exercise', exercise.id)
+        .eq('user_id', user.id)
         .order('date', { ascending: false })
         .order('id', { ascending: false })
         .limit(1)
@@ -91,6 +96,8 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
 
   const fetchTodaySets = async () => {
     try {
+      if (!user?.id) return;
+
       const dateStr = formatDate(date);
       const { data, error } = await supabase
         .from('workouts')
@@ -109,6 +116,7 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
         `)
         .eq('exercise', exercise.id)
         .eq('date', dateStr)
+        .eq('user_id', user.id)
         .order('id', { ascending: true });
 
       if (error) throw error;

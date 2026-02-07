@@ -8,9 +8,9 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 export const Card = ({ children, className, glass, ...props }: CardProps) => (
   <div 
     className={cn(
-      "bg-slate-900 border border-slate-800 rounded-3xl p-5 transition-all duration-300",
-      glass && "bg-slate-900/50 backdrop-blur-md",
-      props.onClick && "active:scale-[0.98] cursor-pointer hover:border-slate-700/50 hover:bg-slate-800/30",
+      "bg-bg-secondary border border-border-primary rounded-3xl p-4 transition-all duration-300",
+      glass && "bg-bg-secondary/50 backdrop-blur-md",
+      props.onClick && "active:scale-[0.98] cursor-pointer hover:border-border-primary/50 hover:bg-bg-tertiary/30",
       className
     )}
     {...props}
@@ -32,10 +32,10 @@ export const Button = ({
   ...props 
 }: ButtonProps) => {
   const variants = {
-    primary: "bg-violet-600 hover:bg-violet-500 text-white shadow-lg shadow-violet-900/20",
-    secondary: "bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700",
-    ghost: "bg-transparent hover:bg-slate-800 text-slate-400 hover:text-slate-200",
-    accent: "bg-gradient-to-r from-violet-600 to-pink-600 text-white shadow-xl shadow-violet-900/30",
+    primary: "bg-accent-primary hover:bg-accent-primary text-white shadow-lg shadow-accent-primary/20",
+    secondary: "bg-bg-tertiary hover:bg-bg-tertiary text-text-secondary border border-border-primary",
+    ghost: "bg-transparent hover:bg-bg-tertiary text-text-muted hover:text-text-secondary",
+    accent: "bg-gradient-to-r from-violet-600 to-pink-600 text-white shadow-xl shadow-accent-primary/30",
     danger: "bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20"
   };
 
@@ -64,9 +64,9 @@ export const Button = ({
 
 export const Badge = ({ children, variant = 'default' }: { children: React.ReactNode, variant?: 'default' | 'outline' | 'vivid' | 'success' }) => {
   const variants = {
-    default: "bg-slate-800 text-slate-400",
-    outline: "border border-slate-700 text-slate-500",
-    vivid: "bg-violet-500/10 text-violet-400 border border-violet-500/20",
+    default: "bg-bg-tertiary text-text-muted",
+    outline: "border border-border-primary text-text-primary0",
+    vivid: "bg-accent-primary/10 text-accent-secondary border border-accent-primary/20",
     success: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
   };
 
@@ -79,10 +79,10 @@ export const Badge = ({ children, variant = 'default' }: { children: React.React
 
 export const Input = ({ label, className, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { label?: string }) => (
   <div className="flex-1">
-    {label && <label className="block text-[10px] font-black text-slate-600 uppercase tracking-tighter mb-1 px-1">{label}</label>}
+    {label && <label className="block text-[10px] font-black text-text-subtle uppercase tracking-tighter mb-1 px-1">{label}</label>}
     <input
       className={cn(
-        "w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-white focus:border-violet-500 outline-none transition-all text-center font-bold placeholder:text-slate-800",
+        "w-full bg-bg-primary border border-border-primary rounded-xl py-2 px-3 text-text-primary focus:border-accent-primary outline-none transition-all text-center font-bold placeholder:text-text-faint",
         className
       )}
       {...props}
@@ -93,8 +93,8 @@ export const Input = ({ label, className, ...props }: React.InputHTMLAttributes<
 export const SectionHeader = ({ title, subtitle, action }: { title: string; subtitle?: string; action?: React.ReactNode }) => (
   <div className="mb-8 flex items-start justify-between">
     <div>
-      <h1 className="text-3xl font-black text-white mb-1">{title}</h1>
-      {subtitle && <p className="text-slate-500 text-sm">{subtitle}</p>}
+      <h1 className="text-3xl font-black text-text-primary mb-1">{title}</h1>
+      {subtitle && <p className="text-text-primary0 text-sm">{subtitle}</p>}
     </div>
     {action && <div>{action}</div>}
   </div>

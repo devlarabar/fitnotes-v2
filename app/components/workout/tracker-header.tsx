@@ -17,7 +17,7 @@ export function TrackerHeader({ exercise, onBack }: Props) {
         <ArrowLeft size={24} />
       </Button>
       <div className="flex-1">
-        <h1 className="text-2xl font-black text-white">{exercise.name}</h1>
+        <h1 className="text-2xl font-black text-text-primary">{exercise.name}</h1>
         <div className="flex gap-2 mt-1">
           <Badge variant="outline">{exercise.categories?.name}</Badge>
           {measurementType && (

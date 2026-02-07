@@ -27,7 +27,7 @@ export function AuthForm({ mode, onSubmit, onToggleMode, signupsEnabled = true }
   return (
     <Card className="p-8 max-w-md w-full">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-black text-white mb-2">
+        <h1 className="text-3xl font-black text-text-primary mb-2">
           {mode === 'signin' ? 'Welcome Back' : 'Get Started'}
         </h1>
         <p className="text-text-muted text-sm">
@@ -51,7 +51,7 @@ export function AuthForm({ mode, onSubmit, onToggleMode, signupsEnabled = true }
             onChange={(e) => setEmail(e.target.value)}
             required
             className="w-full bg-bg-tertiary border border-border-primary 
-              rounded-xl px-4 py-3 text-white focus:border-violet-500 
+              rounded-xl px-4 py-3 text-text-primary focus:border-accent-primary 
               outline-none transition-all"
             placeholder="you@example.com"
           />
@@ -70,7 +70,7 @@ export function AuthForm({ mode, onSubmit, onToggleMode, signupsEnabled = true }
             required
             minLength={6}
             className="w-full bg-bg-tertiary border border-border-primary 
-              rounded-xl px-4 py-3 text-white focus:border-violet-500 
+              rounded-xl px-4 py-3 text-text-primary focus:border-accent-primary 
               outline-none transition-all"
             placeholder="••••••••"
           />
@@ -99,7 +99,7 @@ export function AuthForm({ mode, onSubmit, onToggleMode, signupsEnabled = true }
           <button
             type="button"
             onClick={onToggleMode}
-            className="text-sm text-text-muted hover:text-violet-400 
+            className="text-sm text-text-muted hover:text-accent-secondary 
               transition-colors hover:cursor-pointer"
           >
             {mode === 'signin' 

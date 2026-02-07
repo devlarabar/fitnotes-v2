@@ -15,7 +15,7 @@ const sizeClasses = {
 };
 
 const variantClasses = {
-  primary: 'bg-violet-500/10 text-violet-400',
+  primary: 'bg-accent-primary/10 text-accent-secondary',
   secondary: 'bg-bg-tertiary text-text-dim'
 };
 

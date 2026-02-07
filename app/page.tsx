@@ -7,15 +7,13 @@ import { ProgressPage } from '@/app/components/progress-page';
 import { AnimatePresence, motion } from 'motion/react';
 import { WorkoutPage } from './components/workout/workout-page';
 import { MobileNav, Sidebar } from './components/navigation';
-import { Spinner } from './components/ui';
 import { TabType } from './lib/tabs';
+import { CenteredSpinner } from './components/ui/spinner';
 
 const CalendarComponent = dynamic(() => import('@/app/components/calendar'), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center py-20">
-      <Spinner size="lg" />
-    </div>
+      <CenteredSpinner size="lg" />
   )
 });
 
@@ -54,7 +52,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-primary text-slate-200">
+    <div className="min-h-screen bg-bg-primary text-text-secondary">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <div className="md:pl-64 flex flex-col min-h-screen">

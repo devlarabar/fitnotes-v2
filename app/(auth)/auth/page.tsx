@@ -6,6 +6,7 @@ import { AuthForm } from '@/app/components/auth/auth-form';
 import { signIn, signUp, getSettings } from '@/app/lib/auth';
 import { toast } from 'sonner';
 import { Dumbbell } from 'lucide-react';
+import { CenteredSpinner } from '@/app/components/ui/spinner';
 
 export default function AuthPage() {
   const router = useRouter();
@@ -50,16 +51,16 @@ export default function AuthPage() {
         <div className="text-center">
           <div className="w-20 h-20 rounded-3xl bg-linear-to-br 
             from-violet-600 to-pink-600 flex items-center justify-center 
-            mx-auto mb-4 shadow-xl shadow-violet-900/30"
+            mx-auto mb-4 shadow-xl shadow-accent-primary/30"
           >
             <Dumbbell size={32} className="text-white" />
           </div>
-          <h1 className="text-4xl font-black text-white mb-2">FitNotes</h1>
+          <h1 className="text-4xl font-black text-text-primary mb-2">FitNotes</h1>
           <p className="text-text-muted">Track your fitness journey</p>
         </div>
 
         {loading ? (
-          <div className="text-center text-text-muted">Loading...</div>
+          <CenteredSpinner />
         ) : (
           <>
             <AuthForm

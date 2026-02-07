@@ -30,30 +30,30 @@ export function ExerciseSelector({ exercises, category, onSelect, onBack, onClos
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-100 bg-slate-950 flex flex-col"
+      className="fixed inset-0 z-100 bg-bg-primary flex flex-col"
     >
-      <div className="p-4 border-b border-slate-900 flex items-center gap-4">
+      <div className="p-4 border-b border-border-secondary flex items-center gap-4">
         <Button variant="ghost" onClick={onBack} className="p-2">
           <ArrowLeft size={24} />
         </Button>
         <div className="flex-1">
-          <h2 className="text-xl font-black text-white">{category.name}</h2>
-          <p className="text-xs text-slate-500">{filteredExercises.length} exercises</p>
+          <h2 className="text-xl font-black text-text-primary">{category.name}</h2>
+          <p className="text-xs text-text-primary0">{filteredExercises.length} exercises</p>
         </div>
         <Button variant="ghost" onClick={onClose} className="p-2">
           <X size={24} />
         </Button>
       </div>
 
-      <div className="p-4 border-b border-slate-900">
+      <div className="p-4 border-b border-border-secondary">
         <div className="relative">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-primary0" />
           <input
             type="text"
             placeholder="Search exercises..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-3 pl-10 pr-4 text-white outline-none focus:border-violet-500 transition-all placeholder:text-slate-600"
+            className="w-full bg-bg-secondary border border-border-primary rounded-2xl py-3 pl-10 pr-4 text-text-primary outline-none focus:border-accent-primary transition-all placeholder:text-text-subtle"
           />
         </div>
       </div>
@@ -63,27 +63,27 @@ export function ExerciseSelector({ exercises, category, onSelect, onBack, onClos
           <Card
             key={exercise.id}
             onClick={() => handleSelect(exercise)}
-            className="flex items-center justify-between group hover:border-violet-500/30"
+            className="flex items-center justify-between group hover:border-accent-primary/30"
           >
             <div className="flex items-center gap-4">
-              <IconContainer size="lg" className="group-hover:bg-violet-500/20 transition-all">
+              <IconContainer size="lg" className="group-hover:bg-accent-primary/20 transition-all">
                 <Activity size={20} />
               </IconContainer>
               <div>
-                <h3 className="font-bold text-white group-hover:text-violet-400 transition-colors">
+                <h3 className="font-bold text-text-primary group-hover:text-accent-secondary transition-colors">
                   {exercise.name}
                 </h3>
-                <p className="text-xs text-slate-600 uppercase tracking-wider font-black">
+                <p className="text-xs text-text-subtle uppercase tracking-wider font-black">
                   {exercise.categories?.name || 'Other'}
                 </p>
               </div>
             </div>
-            <ChevronRight size={20} className="text-slate-700 group-hover:text-violet-500 transition-colors" />
+            <ChevronRight size={20} className="text-text-faint group-hover:text-accent-primary transition-colors" />
           </Card>
         ))}
         {filteredExercises.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-slate-600 italic">No exercises found matching &quot;{search}&quot;</p>
+            <p className="text-text-subtle italic">No exercises found matching &quot;{search}&quot;</p>
           </div>
         )}
       </div>

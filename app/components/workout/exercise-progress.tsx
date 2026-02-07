@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Spinner } from '../ui';
 import { PRStatCard } from './pr-stat-card';
 import { ProgressControls } from './progress-controls';
 import { ProgressChart } from './progress-chart';
 import { useExerciseProgress } from '@/app/hooks/use-exercise-progress';
+import { CenteredSpinner } from '../ui/spinner';
 
 interface Props {
   exerciseId: number;
@@ -24,9 +24,7 @@ export function ExerciseProgress({ exerciseId, measurementType }: Props) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-10">
-        <Spinner />
-      </div>
+      <CenteredSpinner />
     );
   }
 

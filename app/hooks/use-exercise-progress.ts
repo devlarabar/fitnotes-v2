@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/app/lib/supabase';
 import { Workout } from '@/app/lib/schema';
+import { useUser } from '@/app/contexts/user-context';
 
 type TimeRange = '30d' | '90d' | '1y' | 'all';
 
@@ -8,15 +9,23 @@ export function useExerciseProgress(
   exerciseId: number,
   measurementType?: string
 ) {
+  const { user } = useUser();
   const [history, setHistory] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchHistory();
-  }, [exerciseId]);
+    if (user?.id) {
+      fetchHistory();
+    }
+  }, [exerciseId, user?.id]);
 
   const fetchHistory = async () => {
     try {
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       const { data, error } = await supabase
         .from('workouts')
@@ -32,6 +41,7 @@ export function useExerciseProgress(
           distance_units(name)
         `)
         .eq('exercise', exerciseId)
+        .eq('user_id', user.id)
         .order('date', { ascending: true });
 
       if (error) throw error;

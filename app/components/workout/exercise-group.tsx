@@ -26,7 +26,7 @@ export function ExerciseGroup({
   onUpdate
 }: Props) {
   return (
-    <div className="bg-slate-800/30 rounded-2xl p-4 border border-slate-800">
+    <div className="bg-bg-tertiary/30 rounded-2xl p-4 border border-border-primary">
       <div
         className={`flex items-center gap-3 mb-3
           ${onExerciseClick
@@ -39,13 +39,13 @@ export function ExerciseGroup({
           <Dumbbell size={18} />
         </IconContainer>
         <div className="flex-1">
-          <h4 className="font-bold text-white">{group.exercise.name}</h4>
-          <p className="text-xs text-slate-500 uppercase tracking-wider">
+          <h4 className="font-bold text-text-primary">{group.exercise.name}</h4>
+          <p className="text-xs text-text-primary0 uppercase tracking-wider">
             {group.exercise.category}
           </p>
         </div>
         {onExerciseClick && (
-          <ChevronRight size={20} className="text-slate-600" />
+          <ChevronRight size={20} className="text-text-subtle" />
         )}
       </div>
 

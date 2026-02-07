@@ -10,6 +10,7 @@ import { Workout } from './schema';
  */
 export async function checkIsPR(
   exerciseId: number,
+  userId: number,
   weight?: number | null,
   reps?: number | null,
   distance?: number | null,
@@ -27,6 +28,7 @@ export async function checkIsPR(
         .from('workouts')
         .select('exercise, weight, reps, distance, time')
         .eq('exercise', exerciseId)
+        .eq('user_id', userId)
         .range(page * pageSize, (page + 1) * pageSize - 1);
 
       if (error) throw error;

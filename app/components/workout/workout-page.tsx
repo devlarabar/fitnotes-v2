@@ -12,7 +12,8 @@ import { DayWorkouts } from './day-workouts';
 import { ExerciseTracker } from './exercise-tracker';
 import { DayComment } from '@/app/components/day-comment';
 import { Plus } from 'lucide-react';
-import { Button, Spinner } from '@/app/components/ui';
+import { Button } from '@/app/components/ui';
+import { CenteredSpinner } from '../ui/spinner';
 
 interface Props {
   initialDate?: Date | null;
@@ -42,7 +43,7 @@ export function WorkoutPage({ initialDate, onDateChange }: Props = {}) {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
-  
+
   const viewDateStr = formatDate(viewDate);
   const dayComment = getCommentForDate(viewDateStr);
 
@@ -117,9 +118,7 @@ export function WorkoutPage({ initialDate, onDateChange }: Props = {}) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" />
-      </div>
+      <CenteredSpinner size="lg" />
     );
   }
 
@@ -135,8 +134,8 @@ export function WorkoutPage({ initialDate, onDateChange }: Props = {}) {
 
       {/* Day comment */}
       {hasWorkoutsForDay && (
-        <DayComment 
-          date={viewDateStr} 
+        <DayComment
+          date={viewDateStr}
           initialComment={dayComment}
           onUpdate={refetchHistory}
         />

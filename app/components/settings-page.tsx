@@ -49,7 +49,7 @@ export function SettingsPage() {
             <circle cx="12" cy="12" r="3"/>
           </svg>
         </div>
-        <h2 className="text-2xl font-black text-white">Settings</h2>
+        <h2 className="text-2xl font-black text-text-primary">Settings</h2>
         <p className="text-text-muted mt-2">v2.0.0 (Next.js + Supabase)</p>
       </div>
 
