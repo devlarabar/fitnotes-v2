@@ -6,6 +6,7 @@ import { AuthForm } from '@/app/components/auth/auth-form';
 import { signIn, signUp, getSettings } from '@/app/lib/auth';
 import { toast } from 'sonner';
 import { Dumbbell } from 'lucide-react';
+import { CenteredSpinner } from '@/app/components/ui/spinner';
 
 export default function AuthPage() {
   const router = useRouter();
@@ -59,7 +60,7 @@ export default function AuthPage() {
         </div>
 
         {loading ? (
-          <div className="text-center text-text-muted">Loading...</div>
+          <CenteredSpinner />
         ) : (
           <>
             <AuthForm
