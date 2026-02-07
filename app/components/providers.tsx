@@ -3,6 +3,7 @@
 import React from 'react';
 import { Toaster } from 'sonner';
 import { ThemeProvider, useTheme } from '@/app/contexts/theme-context';
+import { UserProvider } from '@/app/contexts/user-context';
 
 function ThemedToaster() {
   const { theme } = useTheme();
@@ -28,8 +29,10 @@ function ThemedToaster() {
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
-      <ThemedToaster />
-      {children}
+      <UserProvider>
+        <ThemedToaster />
+        {children}
+      </UserProvider>
     </ThemeProvider>
   );
 }

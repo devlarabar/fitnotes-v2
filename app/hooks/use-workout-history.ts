@@ -3,15 +3,19 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/app/lib/supabase';
 import { Workout, DayComment } from '@/app/lib/schema';
+import { useUser } from '@/app/contexts/user-context';
 
 export function useWorkoutHistory() {
+  const { user } = useUser();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [dayComments, setDayComments] = useState<Map<string, DayComment>>(new Map());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchWorkouts();
-  }, []);
+    if (user?.id) {
+      fetchWorkouts();
+    }
+  }, [user?.id]);
 
   const fetchWorkouts = async () => {
     try {
@@ -27,6 +31,11 @@ export function useWorkoutHistory() {
           setLoading(false);
           return;
         }
+      }
+
+      if (!user?.id) {
+        setLoading(false);
+        return;
       }
 
       // Fetch workouts and comments in parallel
@@ -51,11 +60,13 @@ export function useWorkoutHistory() {
             weight_units(name),
             distance_units(name)
           `)
+          .eq('user_id', user.id)
           .order('date', { ascending: false })
           .order('id', { ascending: false }),
         supabase
           .from('comments')
           .select('*')
+          .eq('user_id', user.id)
       ]);
 
       const { data, error } = workoutsResult;

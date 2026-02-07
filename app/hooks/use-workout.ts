@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/app/lib/supabase';
 import { Exercise, WeightUnit, DistanceUnit, WorkoutData, Category } from '@/app/lib/schema';
 import { checkIsPR } from '@/app/lib/pr-checker';
+import { useUser } from '@/app/contexts/user-context';
 
 interface LocalSet {
   id: string;
@@ -29,6 +30,7 @@ interface LocalWorkout {
 }
 
 export function useWorkout() {
+  const { user } = useUser();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [weightUnits, setWeightUnits] = useState<WeightUnit[]>([]);
@@ -136,10 +138,14 @@ export function useWorkout() {
   ): Promise<number | null> => {
     try {
       const dateStr = formatDate(date);
+      if (!user?.id) {
+        throw new Error('User not authenticated');
+      }
       
       // Check if this is a PR
       const isPR = await checkIsPR(
         exerciseId,
+        user.id,
         set.weight,
         set.reps,
         set.distance,
@@ -157,7 +163,8 @@ export function useWorkout() {
         distance_unit: set.distance_unit || null,
         time: set.time || null,
         comment: null,
-        is_pr: isPR
+        is_pr: isPR,
+        user_id: user.id
       };
 
       const { data, error } = await supabase

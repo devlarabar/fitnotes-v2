@@ -5,6 +5,7 @@ import { Textarea } from './ui/form/textarea';
 import { supabase } from '@/app/lib/supabase';
 import { toast } from 'sonner';
 import { DayComment as DayCommentType } from '@/app/lib/schema';
+import { useUser } from '@/app/contexts/user-context';
 
 interface Props {
   date: string; // YYYY-MM-DD format
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function DayComment({ date, initialComment, onUpdate }: Props) {
+  const { user } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState('');
   const [saving, setSaving] = useState(false);
@@ -44,9 +46,13 @@ export function DayComment({ date, initialComment, onUpdate }: Props) {
         if (error) throw error;
       } else {
         // Create new
+        if (!user?.id) {
+          throw new Error('User not authenticated');
+        }
+
         const { error } = await supabase
           .from('comments')
-          .insert({ date, comment: editValue });
+          .insert({ date, comment: editValue, user_id: user.id });
 
         if (error) throw error;
       }

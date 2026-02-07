@@ -4,6 +4,7 @@ import { supabase } from '@/app/lib/supabase';
 import { Workout } from '@/app/lib/schema';
 import { SetNumberBadge } from '@/app/components/ui';
 import { CenteredSpinner } from '../ui/spinner';
+import { useUser } from '@/app/contexts/user-context';
 
 interface Props {
   exerciseId: number;
@@ -15,15 +16,23 @@ interface GroupedByDate {
 }
 
 export function ExerciseHistory({ exerciseId }: Props) {
+  const { user } = useUser();
   const [history, setHistory] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchHistory();
-  }, [exerciseId]);
+    if (user?.id) {
+      fetchHistory();
+    }
+  }, [exerciseId, user?.id]);
 
   const fetchHistory = async () => {
     try {
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       const { data, error } = await supabase
         .from('workouts')
@@ -42,6 +51,7 @@ export function ExerciseHistory({ exerciseId }: Props) {
           distance_units(name)
         `)
         .eq('exercise', exerciseId)
+        .eq('user_id', user.id)
         .order('date', { ascending: false })
         .order('id', { ascending: false });
 
