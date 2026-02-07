@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
+import { Trophy, MessageSquare } from 'lucide-react';
 import { supabase } from '@/app/lib/supabase';
 import { Workout } from '@/app/lib/schema';
-import { Button, Spinner, SetNumberBadge } from '@/app/components/ui';
+import { Spinner, SetNumberBadge } from '@/app/components/ui';
 
 interface Props {
   exerciseId: number;
 }
 
-const SETS_PER_PAGE = 20;
+interface GroupedByDate {
+  date: string;
+  sets: Workout[];
+}
 
 export function ExerciseHistory({ exerciseId }: Props) {
   const [history, setHistory] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0);
 
   useEffect(() => {
     fetchHistory();
@@ -33,6 +35,7 @@ export function ExerciseHistory({ exerciseId }: Props) {
           distance,
           distance_unit,
           time,
+          comment,
           is_pr,
           weight_units(name),
           distance_units(name)
@@ -54,6 +57,7 @@ export function ExerciseHistory({ exerciseId }: Props) {
         distance: item.distance,
         distance_unit: item.distance_unit,
         time: item.time,
+        comment: item.comment,
         is_pr: item.is_pr,
         weight_units: item.weight_units ? { name: item.weight_units.name } : undefined,
         distance_units: item.distance_units ? { name: item.distance_units.name } : undefined
@@ -67,10 +71,16 @@ export function ExerciseHistory({ exerciseId }: Props) {
     }
   };
 
-  const totalPages = Math.ceil(history.length / SETS_PER_PAGE);
-  const startIdx = page * SETS_PER_PAGE;
-  const endIdx = startIdx + SETS_PER_PAGE;
-  const paginatedHistory = history.slice(startIdx, endIdx);
+  // Group sets by date
+  const groupedByDate: GroupedByDate[] = history.reduce((acc, set) => {
+    const existing = acc.find(g => g.date === set.date);
+    if (existing) {
+      existing.sets.push(set);
+    } else {
+      acc.push({ date: set.date, sets: [set] });
+    }
+    return acc;
+  }, [] as GroupedByDate[]);
 
   if (loading) {
     return (
@@ -89,74 +99,64 @@ export function ExerciseHistory({ exerciseId }: Props) {
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-xs text-text-dim font-bold uppercase tracking-wider">
-          {history.length} total sets
-        </p>
-        {totalPages > 1 && (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              onClick={() => setPage(p => Math.max(0, p - 1))}
-              disabled={page === 0}
-              className="p-1 h-auto"
-            >
-              <ChevronLeft size={16} />
-            </Button>
-            <span className="text-xs text-text-dim font-bold">
-              {page + 1} / {totalPages}
-            </span>
-            <Button
-              variant="ghost"
-              onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-              disabled={page === totalPages - 1}
-              className="p-1 h-auto"
-            >
-              <ChevronRight size={16} />
-            </Button>
-          </div>
-        )}
-      </div>
-
-      <div className="space-y-2 max-h-100 overflow-y-auto">
-        {paginatedHistory.map((set, idx) => (
-          <div
-            key={set.id}
-            className="flex items-center justify-between p-3 bg-bg-tertiary/30 rounded-xl text-sm"
-          >
-            <div className="flex items-center gap-3">
-              <SetNumberBadge number={startIdx + idx + 1} />
-              <span className="text-text-dim text-xs">
-                {new Date(set.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-              </span>
-            </div>
-            <div className="flex items-center gap-3 text-sm">
-              <div className="flex gap-3">
-                {set.weight !== null && set.weight !== undefined && (
-                  <span className="font-bold text-accent-secondary">
-                    {set.weight} {set.weight_units?.name}
-                  </span>
-                )}
-                {set.reps !== null && set.reps !== undefined && (
-                  <span className="text-text-secondary">{set.reps} reps</span>
-                )}
-                {set.distance !== null && set.distance !== undefined && (
-                  <span className="font-bold text-accent-secondary">
-                    {set.distance} {set.distance_units?.name}
-                  </span>
-                )}
-                {set.time && (
-                  <span className="text-text-secondary">{set.time}</span>
+    <div className="space-y-4 max-h-96 overflow-y-auto">
+      {groupedByDate.map((group) => (
+        <div key={group.date} className="space-y-2">
+          <h4 className="text-xs text-text-dim font-bold uppercase tracking-wider sticky top-0 bg-bg-secondary py-2">
+            {new Date(group.date).toLocaleDateString('en-US', { 
+              weekday: 'short',
+              month: 'short', 
+              day: 'numeric', 
+              year: 'numeric' 
+            })}
+          </h4>
+          <div className="space-y-2">
+            {group.sets.map((set, idx) => (
+              <div
+                key={set.id}
+                className="bg-bg-tertiary/30 rounded-xl"
+              >
+                <div className="flex items-center justify-between p-3 text-sm">
+                  <div className="flex items-center gap-3">
+                    <SetNumberBadge number={idx + 1} />
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="flex gap-3">
+                      {set.weight !== null && set.weight !== undefined && (
+                        <span className="font-bold text-accent-secondary">
+                          {set.weight} {set.weight_units?.name}
+                        </span>
+                      )}
+                      {set.reps !== null && set.reps !== undefined && (
+                        <span className="text-text-secondary">{set.reps} reps</span>
+                      )}
+                      {set.distance !== null && set.distance !== undefined && (
+                        <span className="font-bold text-accent-secondary">
+                          {set.distance} {set.distance_units?.name}
+                        </span>
+                      )}
+                      {set.time && (
+                        <span className="text-text-secondary">{set.time}</span>
+                      )}
+                    </div>
+                    {set.is_pr && (
+                      <Trophy size={16} className="text-yellow-500" />
+                    )}
+                  </div>
+                </div>
+                {set.comment && (
+                  <div className="px-3 pb-3 pt-0">
+                    <div className="flex items-start gap-1.5">
+                      <MessageSquare size={12} className="text-slate-600 shrink-0 mt-0.5" />
+                      <p className="text-xs text-text-muted italic">{set.comment}</p>
+                    </div>
+                  </div>
                 )}
               </div>
-              {set.is_pr && (
-                <Trophy size={16} className="text-yellow-500" />
-              )}
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
 }

@@ -271,7 +271,7 @@ export function ExerciseTracker({
             className={`flex-1 py-3 text-sm font-bold transition-colors ${
               activeTab === 'sets'
                 ? 'text-accent-secondary border-b-2 border-accent-primary'
-                : 'text-text-dim hover:text-text-secondary'
+                : 'text-text-dim hover:text-text-secondary hover:cursor-pointer'
             }`}
           >
             Track Set
@@ -281,7 +281,7 @@ export function ExerciseTracker({
             className={`flex-1 py-3 text-sm font-bold transition-colors ${
               activeTab === 'history'
                 ? 'text-accent-secondary border-b-2 border-accent-primary'
-                : 'text-text-dim hover:text-text-secondary'
+                : 'text-text-dim hover:text-text-secondary hover:cursor-pointer'
             }`}
           >
             History
