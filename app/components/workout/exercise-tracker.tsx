@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Plus, Trash2, Save, Trophy, X } from 'lucide-react';
 import { Exercise, WeightUnit, DistanceUnit, Workout } from '@/app/lib/schema';
 import { Button, Card, Badge } from '@/app/components/ui';
+import { Textarea } from '@/app/components/ui/form/textarea';
 import { SetInputs } from '@/app/components/set-inputs';
 import { ExerciseHistory } from './exercise-history';
 import { supabase } from '@/app/lib/supabase';
@@ -14,6 +15,7 @@ interface LocalSet {
   distance?: number;
   distance_unit?: number;
   time?: string;
+  comment?: string;
 }
 
 interface Props {
@@ -40,7 +42,8 @@ export function ExerciseTracker({
     reps: 0,
     distance: 0,
     distance_unit: distanceUnits[0]?.id || 1,
-    time: '00:00'
+    time: '00:00',
+    comment: ''
   });
   const [saving, setSaving] = useState(false);
   const [todaySets, setTodaySets] = useState<Workout[]>([]);
@@ -73,7 +76,8 @@ export function ExerciseTracker({
           reps: data.reps || 0,
           distance: data.distance || 0,
           distance_unit: data.distance_unit || distanceUnits[0]?.id || 1,
-          time: data.time || '00:00'
+          time: data.time || '00:00',
+          comment: '' // Don't carry over comments
         });
       }
     } catch (err) {
@@ -95,6 +99,7 @@ export function ExerciseTracker({
           distance,
           distance_unit,
           time,
+          comment,
           is_pr,
           weight_units(name),
           distance_units(name)
@@ -116,6 +121,7 @@ export function ExerciseTracker({
         distance: item.distance,
         distance_unit: item.distance_unit,
         time: item.time,
+        comment: item.comment,
         is_pr: item.is_pr,
         weight_units: item.weight_units ? { name: item.weight_units.name } : undefined,
         distance_units: item.distance_units ? { name: item.distance_units.name } : undefined
@@ -149,7 +155,8 @@ export function ExerciseTracker({
             reps: currentSet.reps || null,
             distance: currentSet.distance || null,
             distance_unit: currentSet.distance_unit || null,
-            time: currentSet.time || null
+            time: currentSet.time || null,
+            comment: currentSet.comment || null
           })
           .eq('id', editingSetId);
 
@@ -175,14 +182,15 @@ export function ExerciseTracker({
       // Refresh today's sets
       await fetchTodaySets();
       
-      // Keep current values for next set
+      // Keep current values for next set, but clear comment
       setCurrentSet({
         weight: currentSet.weight,
         weight_unit: currentSet.weight_unit,
         reps: currentSet.reps,
         distance: currentSet.distance,
         distance_unit: currentSet.distance_unit,
-        time: currentSet.time
+        time: currentSet.time,
+        comment: ''
       });
     } catch (err) {
       toast.error('Failed to save set');
@@ -199,7 +207,8 @@ export function ExerciseTracker({
       reps: set.reps || 0,
       distance: set.distance || 0,
       distance_unit: set.distance_unit || distanceUnits[0]?.id || 1,
-      time: set.time || '00:00'
+      time: set.time || '00:00',
+      comment: set.comment || ''
     });
   };
 
@@ -282,16 +291,25 @@ export function ExerciseTracker({
         <div className="p-6">
           {activeTab === 'sets' ? (
             <div className="space-y-6">
-              <div className="flex items-end gap-3">
-                <SetInputs
-                  set={{
-                    id: 'current',
-                    ...currentSet
-                  }}
-                  measurementType={measurementType}
-                  weightUnits={weightUnits}
-                  distanceUnits={distanceUnits}
-                  onUpdate={handleUpdateSet}
+              <div className="space-y-3">
+                <div className="flex items-end gap-3">
+                  <SetInputs
+                    set={{
+                      id: 'current',
+                      ...currentSet
+                    }}
+                    measurementType={measurementType}
+                    weightUnits={weightUnits}
+                    distanceUnits={distanceUnits}
+                    onUpdate={handleUpdateSet}
+                  />
+                </div>
+                
+                <Textarea
+                  placeholder="Add a note (optional)"
+                  value={currentSet.comment || ''}
+                  onChange={(e) => handleUpdateSet({ comment: e.target.value })}
+                  className="bg-bg-tertiary border-border-primary text-text-primary"
                 />
               </div>
 
@@ -339,47 +357,54 @@ export function ExerciseTracker({
                     {todaySets.map((set, idx) => (
                       <div
                         key={set.id}
-                        className={`group flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
+                        className={`group rounded-xl cursor-pointer transition-colors ${
                           editingSetId === set.id
                             ? 'bg-violet-500/20 border border-violet-500/50'
                             : 'bg-bg-tertiary/30 hover:bg-bg-tertiary/50'
                         }`}
                         onClick={() => handleEditSet(set)}
                       >
-                        <div className="w-6 h-6 rounded-lg bg-bg-tertiary flex items-center justify-center text-xs font-bold text-text-dim">
-                          {idx + 1}
+                        <div className="flex items-center gap-3 p-3">
+                          <div className="w-6 h-6 rounded-lg bg-bg-tertiary flex items-center justify-center text-xs font-bold text-text-dim">
+                            {idx + 1}
+                          </div>
+                          <div className="flex-1 flex gap-3 text-sm">
+                            {set.weight !== null && set.weight !== undefined && (
+                              <span className="font-bold text-accent-secondary">
+                                {set.weight} {set.weight_units?.name}
+                              </span>
+                            )}
+                            {set.reps !== null && set.reps !== undefined && (
+                              <span className="text-text-secondary">{set.reps} reps</span>
+                            )}
+                            {set.distance !== null && set.distance !== undefined && (
+                              <span className="font-bold text-accent-secondary">
+                                {set.distance} {set.distance_units?.name}
+                              </span>
+                            )}
+                            {set.time && (
+                              <span className="text-text-secondary">{set.time}</span>
+                            )}
+                          </div>
+                          {set.is_pr && (
+                            <Trophy size={16} className="text-yellow-500" />
+                          )}
+                          <Button
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteSet(set.id);
+                            }}
+                            className="p-2 h-auto text-slate-700 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
                         </div>
-                        <div className="flex-1 flex gap-3 text-sm">
-                          {set.weight !== null && set.weight !== undefined && (
-                            <span className="font-bold text-accent-secondary">
-                              {set.weight} {set.weight_units?.name}
-                            </span>
-                          )}
-                          {set.reps !== null && set.reps !== undefined && (
-                            <span className="text-text-secondary">{set.reps} reps</span>
-                          )}
-                          {set.distance !== null && set.distance !== undefined && (
-                            <span className="font-bold text-accent-secondary">
-                              {set.distance} {set.distance_units?.name}
-                            </span>
-                          )}
-                          {set.time && (
-                            <span className="text-text-secondary">{set.time}</span>
-                          )}
-                        </div>
-                        {set.is_pr && (
-                          <Trophy size={16} className="text-yellow-500" />
+                        {set.comment && (
+                          <div className="px-3 pb-3 pt-0">
+                            <p className="text-xs text-text-muted italic">{set.comment}</p>
+                          </div>
                         )}
-                        <Button
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteSet(set.id);
-                          }}
-                          className="p-2 h-auto text-slate-700 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Trash2 size={16} />
-                        </Button>
                       </div>
                     ))}
                   </div>

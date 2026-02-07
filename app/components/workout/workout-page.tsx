@@ -10,6 +10,7 @@ import { Category, Exercise } from '@/app/lib/schema';
 import { DayNavigation } from './day-navigation';
 import { DayWorkouts } from './day-workouts';
 import { ExerciseTracker } from './exercise-tracker';
+import { DayComment } from '@/app/components/day-comment';
 import { Plus } from 'lucide-react';
 import { Button } from '@/app/components/ui';
 
@@ -123,6 +124,11 @@ export function WorkoutPage() {
         onNext={goToNextDay}
         onToday={goToToday}
       />
+
+      {/* Day comment */}
+      {hasWorkoutsForDay && (
+        <DayComment date={viewDateStr} />
+      )}
 
       <DayWorkouts
         date={viewDateStr}

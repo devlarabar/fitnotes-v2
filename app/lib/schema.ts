@@ -75,3 +75,9 @@ export interface DayWorkoutsProps {
   date: string // Format: YYYY-MM-DD
   title?: string
 }
+
+export interface DayComment {
+  id: number
+  date: string
+  comment: string
+}
