@@ -49,7 +49,6 @@ export function ExerciseSelector({ exercises, category, onSelect, onBack, onClos
         <div className="relative">
           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
           <input
-            autoFocus
             type="text"
             placeholder="Search exercises..."
             value={search}

@@ -34,7 +34,7 @@ export function WorkoutPage({ initialDate, onDateChange }: Props = {}) {
     saveSetToSupabase
   } = useWorkout();
 
-  const { workouts, refetch: refetchHistory } = useWorkoutHistory();
+  const { workouts, getCommentForDate, refetch: refetchHistory } = useWorkoutHistory();
 
   const formatDate = (date: Date): string => {
     const year = date.getFullYear();
@@ -42,6 +42,9 @@ export function WorkoutPage({ initialDate, onDateChange }: Props = {}) {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
+  
+  const viewDateStr = formatDate(viewDate);
+  const dayComment = getCommentForDate(viewDateStr);
 
   const getGroupedWorkouts = (date: string) => {
     const dayWorkouts = workouts.filter(w => w.date === date);
@@ -95,7 +98,6 @@ export function WorkoutPage({ initialDate, onDateChange }: Props = {}) {
   };
 
   const isToday = viewDate.toDateString() === new Date().toDateString();
-  const viewDateStr = formatDate(viewDate);
   const hasWorkoutsForDay = getGroupedWorkouts(viewDateStr).length > 0;
 
   // If tracking a specific exercise, show the tracker
@@ -135,7 +137,11 @@ export function WorkoutPage({ initialDate, onDateChange }: Props = {}) {
 
       {/* Day comment */}
       {hasWorkoutsForDay && (
-        <DayComment date={viewDateStr} />
+        <DayComment 
+          date={viewDateStr} 
+          initialComment={dayComment}
+          onUpdate={refetchHistory}
+        />
       )}
 
       <DayWorkouts
