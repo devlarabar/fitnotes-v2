@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { SettingsPage } from '@/app/components/settings-page';
 import { AnimatePresence, motion } from 'motion/react';
 import { WorkoutPage } from './components/workout/workout-page';
-import { MobileNav, Sidebar } from './components/Navigation';
+import { MobileNav, Sidebar } from './components/navigation';
 
 const Calendar = dynamic(() => import('@/app/components/calendar'), {
   ssr: false,
