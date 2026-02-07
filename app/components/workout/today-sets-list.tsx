@@ -16,7 +16,7 @@ export function TodaySetsList({ sets, editingSetId, onEdit, onDelete }: Props) {
   return (
     <div className="space-y-2 pt-4 border-t border-border-primary">
       <p className="text-xs text-text-dim font-bold uppercase tracking-wider">
-        Today's Sets ({sets.length})
+        Today&apos;s Sets ({sets.length})
       </p>
       <div className="space-y-2">
         {sets.map((set, idx) => (

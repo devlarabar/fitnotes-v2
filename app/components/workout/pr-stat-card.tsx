@@ -60,7 +60,7 @@ export function PRStatCard({ stats }: Props) {
                   <TooltipContent 
                     className="bg-slate-800 text-white border border-slate-700"
                   >
-                    The heaviest weight you've lifted for this exercise
+                    The heaviest weight you&apos;ve lifted for this exercise
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -107,7 +107,7 @@ export function PRStatCard({ stats }: Props) {
                   <TooltipContent 
                     className="bg-slate-800 text-white border border-slate-700"
                   >
-                    The farthest distance you've covered
+                    The farthest distance you&apos;ve covered
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -153,7 +153,7 @@ export function PRStatCard({ stats }: Props) {
                 <TooltipContent 
                   className="bg-slate-800 text-white border border-slate-700"
                 >
-                  The longest duration you've held this exercise
+                  The longest duration you&apos;ve held this exercise
                 </TooltipContent>
               </Tooltip>
             </div>
