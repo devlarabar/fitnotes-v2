@@ -28,7 +28,7 @@ export function Sidebar({ activeTab, setActiveTab }: Props) {
     >
       <div className="flex items-center gap-4 mb-12">
         <div className={`w-12 h-12 rounded-2xl bg-linear-to-br from-accent-primary 
-        to-accent-pink flex items-center justify-center text-text-primary font-black 
+        to-accent-pink flex items-center justify-center text-white font-black 
         text-2xl shadow-lg shadow-accent-primary/30`}
         >
           F
