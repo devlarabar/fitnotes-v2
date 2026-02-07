@@ -69,7 +69,7 @@ create table public.settings (
 );
 
 -- Insert default settings row
-insert into public.settings (signups_enabled) values (true);
+insert into public.settings (signups_enabled) values (false);
 
 -- Enable Row Level Security (deny everything by default)
 alter table public.categories enable row level security;
@@ -151,9 +151,8 @@ create policy "Authenticated users can select exercises"
   to authenticated
   using (true);
 
-create policy "Authenticated users can select settings"
+create policy "Everyone can select settings"
   on public.settings for select
-  to authenticated
   using (true);
 
 -- Create indexes for better performance

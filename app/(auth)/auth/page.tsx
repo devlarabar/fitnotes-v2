@@ -52,7 +52,7 @@ export default function AuthPage() {
             from-violet-600 to-pink-600 flex items-center justify-center 
             mx-auto mb-4 shadow-xl shadow-accent-primary/30"
           >
-            <Dumbbell size={32} className="text-text-primary" />
+            <Dumbbell size={32} className="text-white" />
           </div>
           <h1 className="text-4xl font-black text-text-primary mb-2">FitNotes</h1>
           <p className="text-text-muted">Track your fitness journey</p>
