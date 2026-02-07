@@ -1,10 +1,11 @@
 import React from 'react';
 import { Dumbbell, Calendar, TrendingUp, Settings } from 'lucide-react';
 import { cn } from '@/app/lib/utils';
+import { TabType } from '../lib/tabs';
 
 interface Props {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
+  activeTab: TabType;
+  setActiveTab: (tab: TabType) => void;
 }
 
 const NAV_ITEMS = [
@@ -28,7 +29,9 @@ export function Sidebar({ activeTab, setActiveTab }: Props) {
           F
         </div>
         <span className={`text-2xl font-black bg-clip-text text-transparent 
-        bg-linear-to-r from-white to-text-dim tracking-tight`}>
+        bg-linear-to-r from-white to-text-dim tracking-tight hover:cursor-pointer`}
+          onClick={() => setActiveTab('workout')}
+        >
           FitNotes
         </span>
       </div>

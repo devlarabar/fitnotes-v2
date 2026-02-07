@@ -5,6 +5,7 @@ import { TrackerHeader } from './tracker-header';
 import { SetForm } from './set-form';
 import { TodaySetsList } from './today-sets-list';
 import { ExerciseHistory } from './exercise-history';
+import { ExerciseProgress } from './exercise-progress';
 import { supabase } from '@/app/lib/supabase';
 import { toast } from 'sonner';
 import { useWorkout } from '@/app/hooks/use-workout';
@@ -33,7 +34,7 @@ interface Props {
 
 export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
   const { weightUnits, distanceUnits } = useWorkout();
-  const [activeTab, setActiveTab] = useState<'sets' | 'history'>('sets');
+  const [activeTab, setActiveTab] = useState<'sets' | 'history' | 'progress'>('sets');
   const [currentSet, setCurrentSet] = useState<LocalSet>({
     weight: 0,
     weight_unit: weightUnits[0]?.id || 1,
@@ -258,10 +259,19 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
           >
             History
           </button>
+          <button
+            onClick={() => setActiveTab('progress')}
+            className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === 'progress'
+              ? 'text-accent-secondary border-b-2 border-accent-primary'
+              : 'text-text-dim hover:text-text-secondary hover:cursor-pointer'
+              }`}
+          >
+            Progress
+          </button>
         </div>
 
         <div className="p-6">
-          {activeTab === 'sets' ? (
+          {activeTab === 'sets' && (
             <div className="space-y-6">
               <SetForm
                 set={currentSet}
@@ -280,8 +290,12 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
                 onDelete={handleDeleteSet}
               />
             </div>
-          ) : (
+          )}
+          {activeTab === 'history' && (
             <ExerciseHistory exerciseId={exercise.id} />
+          )}
+          {activeTab === 'progress' && (
+            <ExerciseProgress exerciseId={exercise.id} measurementType={measurementType} />
           )}
         </div>
       </Card>

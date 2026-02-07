@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { WorkoutPage } from './components/workout/workout-page';
 import { MobileNav, Sidebar } from './components/navigation';
 import { Spinner } from './components/ui';
+import { TabType } from './lib/tabs';
 
 const CalendarComponent = dynamic(() => import('@/app/components/calendar'), {
   ssr: false,
@@ -18,7 +19,7 @@ const CalendarComponent = dynamic(() => import('@/app/components/calendar'), {
 });
 
 export default function HomePage() {
-  const [activeTab, setActiveTab] = useState('workout');
+  const [activeTab, setActiveTab] = useState<TabType>('workout');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const handleDateSelect = (date: Date) => {
