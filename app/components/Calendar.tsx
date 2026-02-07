@@ -3,8 +3,6 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Dumbbell } from 'lucide-react';
 import { useWorkoutHistory } from '@/app/hooks/use-workout-history';
-import { useWorkout } from '@/app/hooks/use-workout';
-import { WorkoutDayView } from './workout-day-view';
 import { motion } from 'motion/react';
 import { Button, Card, SectionHeader } from './ui';
 
@@ -14,11 +12,13 @@ const MONTHS = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-export default function Calendar() {
+interface Props {
+  onDateSelect: (date: Date) => void;
+}
+
+export default function Calendar({ onDateSelect }: Props) {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const { workouts, loading, getWorkoutDates, refetch } = useWorkoutHistory();
-  const { exercises, weightUnits, distanceUnits } = useWorkout();
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const { loading, getWorkoutDates } = useWorkoutHistory();
 
   const workoutDates = getWorkoutDates();
 
@@ -33,17 +33,14 @@ export default function Calendar() {
   // Navigate months
   const goToPreviousMonth = () => {
     setCurrentDate(new Date(year, month - 1, 1));
-    setSelectedDate(null);
   };
 
   const goToNextMonth = () => {
     setCurrentDate(new Date(year, month + 1, 1));
-    setSelectedDate(null);
   };
 
   const goToToday = () => {
     setCurrentDate(new Date());
-    setSelectedDate(null);
   };
 
   // Build calendar grid
@@ -94,32 +91,9 @@ export default function Calendar() {
     return workoutDates.has(formatDate(date));
   };
 
-  // Group workouts by exercise for a given date
-  const getGroupedWorkouts = (date: string) => {
-    const dayWorkouts = workouts.filter(w => w.date === date);
-    const grouped = new Map<number, { exercise: any; sets: any[] }>();
-
-    dayWorkouts.forEach(workout => {
-      if (!grouped.has(workout.exercise)) {
-        grouped.set(workout.exercise, {
-          exercise: {
-            id: workout.exercise,
-            name: workout.exercises?.name || 'Unknown',
-            category: workout.categories?.name || 'Unknown'
-          },
-          sets: []
-        });
-      }
-      grouped.get(workout.exercise)!.sets.push(workout);
-    });
-
-    return Array.from(grouped.values());
-  };
-
   const handleDateClick = (date: Date, isCurrentMonth: boolean) => {
     if (!isCurrentMonth) return;
-    const dateStr = formatDate(date);
-    setSelectedDate(selectedDate === dateStr ? null : dateStr);
+    onDateSelect(date);
   };
 
   if (loading) {
@@ -174,8 +148,6 @@ export default function Calendar() {
         {/* Calendar Grid */}
         <div className="grid grid-cols-7 gap-2">
           {calendarDays.map((item, idx) => {
-            const dateStr = formatDate(item.date);
-            const isSelected = selectedDate === dateStr;
             const todayDate = isToday(item.date);
             const workout = hasWorkout(item.date);
 
@@ -188,8 +160,7 @@ export default function Calendar() {
                   hover:cursor-pointer
                   ${!item.isCurrentMonth ? 'text-slate-700 cursor-default' : 'text-slate-300 hover:bg-slate-800'}
                   ${todayDate && item.isCurrentMonth ? 'ring-2 ring-violet-500' : ''}
-                  ${isSelected ? 'bg-violet-500 text-white' : ''}
-                  ${workout && item.isCurrentMonth && !isSelected ? 'bg-violet-500/20 text-violet-400' : ''}
+                  ${workout && item.isCurrentMonth ? 'bg-violet-500/20 text-violet-400' : ''}
                 `}
                 whileTap={item.isCurrentMonth ? { scale: 0.95 } : {}}
               >
@@ -204,24 +175,6 @@ export default function Calendar() {
           })}
         </div>
       </Card>
-
-      {/* Selected Date Workouts */}
-      {selectedDate && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-        >
-          <WorkoutDayView
-            date={selectedDate}
-            groupedWorkouts={getGroupedWorkouts(selectedDate)}
-            exercises={exercises}
-            onUpdate={refetch}
-            showTitle={true}
-            onExerciseClick={() => { }}  // No editing on this page
-          />
-        </motion.div>
-      )}
     </div>
   );
 }

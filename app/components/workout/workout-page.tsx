@@ -14,10 +14,15 @@ import { DayComment } from '@/app/components/day-comment';
 import { Plus } from 'lucide-react';
 import { Button, Spinner } from '@/app/components/ui';
 
-export function WorkoutPage() {
+interface Props {
+  initialDate?: Date | null;
+  onDateChange?: () => void;
+}
+
+export function WorkoutPage({ initialDate, onDateChange }: Props = {}) {
   const [isCategorySelectorOpen, setIsCategorySelectorOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [viewDate, setViewDate] = useState(new Date());
+  const [viewDate, setViewDate] = useState(initialDate || new Date());
   const [trackingExercise, setTrackingExercise] = useState<Exercise | null>(null);
 
   const {
@@ -63,16 +68,19 @@ export function WorkoutPage() {
     const newDate = new Date(viewDate);
     newDate.setDate(newDate.getDate() - 1);
     setViewDate(newDate);
+    onDateChange?.();
   };
 
   const goToNextDay = () => {
     const newDate = new Date(viewDate);
     newDate.setDate(newDate.getDate() + 1);
     setViewDate(newDate);
+    onDateChange?.();
   };
 
   const goToToday = () => {
     setViewDate(new Date());
+    onDateChange?.();
   };
 
   const handleOpenSelector = () => {

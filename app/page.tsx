@@ -8,7 +8,7 @@ import { WorkoutPage } from './components/workout/workout-page';
 import { MobileNav, Sidebar } from './components/navigation';
 import { Spinner } from './components/ui';
 
-const Calendar = dynamic(() => import('@/app/components/calendar'), {
+const CalendarComponent = dynamic(() => import('@/app/components/calendar'), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center py-20">
@@ -19,19 +19,25 @@ const Calendar = dynamic(() => import('@/app/components/calendar'), {
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState('workout');
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  const handleDateSelect = (date: Date) => {
+    setSelectedDate(date);
+    setActiveTab('workout');
+  };
 
   const renderView = () => {
     switch (activeTab) {
       case 'workout':
-        return <WorkoutPage />;
+        return <WorkoutPage initialDate={selectedDate} onDateChange={() => setSelectedDate(null)} />;
       case 'history':
-        return <Calendar />;
+        return <CalendarComponent onDateSelect={handleDateSelect} />;
       case 'progress':
         return <div>Progress coming soon</div>;
       case 'settings':
         return <SettingsPage />;
       default:
-        return <WorkoutPage />;
+        return <WorkoutPage initialDate={selectedDate} onDateChange={() => setSelectedDate(null)} />;
     }
   };
 
