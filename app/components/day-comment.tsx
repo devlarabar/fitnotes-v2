@@ -89,71 +89,73 @@ export function DayComment({ date, initialComment, onUpdate }: Props) {
   };
 
   return (
-    <Card className={`p-4 transition-all ${isEditing ? 'h-auto' : 'h-24'} overflow-y-auto`}>
-      {isEditing ? (
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm font-bold text-text-secondary">
+    <Card className={`transition-all ${isEditing ? 'h-auto' : 'h-24'} overflow-hidden`}>
+      <div className={`p-0 h-full overflow-y-auto`}>
+        {isEditing ? (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-sm font-bold text-text-secondary">
+              <MessageSquare size={16} />
+              Day Note
+            </div>
+            <Textarea
+              placeholder="Add a note for this day..."
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              className={`bg-bg-tertiary border-border-primary text-text-primary 
+                resize-none`}
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                onClick={handleCancel}
+                disabled={saving}
+                className="flex-1"
+              >
+                <X size={16} />
+                Cancel
+              </Button>
+              <Button
+                variant="accent"
+                onClick={handleSave}
+                disabled={saving}
+                className="flex-1"
+              >
+                {saving ? (
+                  <>
+                    <SpinnerInline />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} />
+                    Save
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        ) : initialComment ? (
+          <div
+            className="flex items-start gap-3 cursor-pointer h-full"
+            onClick={handleStartEdit}
+          >
+            <MessageSquare size={16} className="text-text-dim mt-0.5 shrink-0" />
+            <p className="flex-1 text-sm text-text-secondary italic">
+              {initialComment.comment}
+            </p>
+          </div>
+        ) : (
+          <button
+            onClick={handleStartEdit}
+            className={`w-full h-full flex items-center justify-center 
+              gap-2 text-text-dim hover:text-text-secondary transition-colors`}
+          >
             <MessageSquare size={16} />
-            Day Note
-          </div>
-          <Textarea
-            placeholder="Add a note for this day..."
-            value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
-            className={`bg-bg-tertiary border-border-primary text-text-primary 
-              resize-none`}
-            autoFocus
-          />
-          <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              onClick={handleCancel}
-              disabled={saving}
-              className="flex-1"
-            >
-              <X size={16} />
-              Cancel
-            </Button>
-            <Button
-              variant="accent"
-              onClick={handleSave}
-              disabled={saving}
-              className="flex-1"
-            >
-              {saving ? (
-                <>
-                  <SpinnerInline />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save size={16} />
-                  Save
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-      ) : initialComment ? (
-        <div
-          className="flex items-start gap-3 cursor-pointer h-full"
-          onClick={handleStartEdit}
-        >
-          <MessageSquare size={16} className="text-text-dim mt-0.5 shrink-0" />
-          <p className="flex-1 text-sm text-text-secondary italic">
-            {initialComment.comment}
-          </p>
-        </div>
-      ) : (
-        <button
-          onClick={handleStartEdit}
-          className={`w-full h-full flex items-center justify-center 
-            gap-2 text-text-dim hover:text-text-secondary transition-colors`}
-        >
-          <MessageSquare size={16} />
-          <span className="text-sm hover:cursor-pointer">Add day note</span>
-        </button>
-      )}
+            <span className="text-sm hover:cursor-pointer">Add day note</span>
+          </button>
+        )}
+      </div>
     </Card>
   );
 }
