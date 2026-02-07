@@ -8,7 +8,7 @@ import { ExerciseHistory } from './exercise-history';
 import { ExerciseProgress } from './exercise-progress';
 import { supabase } from '@/app/lib/supabase';
 import { toast } from 'sonner';
-import { useWorkout } from '@/app/hooks/use-workout';
+import { useWorkoutData } from '@/app/contexts/workout-data-context';
 import { useUser } from '@/app/contexts/user-context';
 
 interface LocalSet {
@@ -35,7 +35,7 @@ interface Props {
 
 export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
   const { user } = useUser();
-  const { weightUnits, distanceUnits } = useWorkout();
+  const { weightUnits, distanceUnits, workouts, refetch } = useWorkoutData();
   const [activeTab, setActiveTab] = useState<'sets' | 'history' | 'progress'>('sets');
   const [currentSet, setCurrentSet] = useState<LocalSet>({
     weight: 0,
@@ -54,8 +54,8 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
 
   useEffect(() => {
     fetchLastSetData();
-    fetchTodaySets();
-  }, [exercise.id, date]);
+    updateTodaySetsFromCache();
+  }, [exercise.id, date, workouts]);
 
   const formatDate = (date: Date): string => {
     const year = date.getFullYear();
@@ -94,58 +94,12 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
     }
   };
 
-  const fetchTodaySets = async () => {
-    try {
-      if (!user?.id) return;
-
-      const dateStr = formatDate(date);
-      const { data, error } = await supabase
-        .from('workouts')
-        .select(`
-          id,
-          weight,
-          weight_unit,
-          reps,
-          distance,
-          distance_unit,
-          time,
-          comment,
-          is_pr,
-          weight_units(name),
-          distance_units(name)
-        `)
-        .eq('exercise', exercise.id)
-        .eq('date', dateStr)
-        .eq('user_id', user.id)
-        .order('id', { ascending: true });
-
-      if (error) throw error;
-
-      const workouts = (data || []).map((item: any) => ({
-        id: item.id,
-        date: dateStr,
-        exercise: exercise.id,
-        category: exercise.category || 0,
-        weight: item.weight,
-        weight_unit: item.weight_unit,
-        reps: item.reps,
-        distance: item.distance,
-        distance_unit: item.distance_unit,
-        time: item.time,
-        comment: item.comment,
-        is_pr: item.is_pr,
-        weight_units: item.weight_units
-          ? { name: item.weight_units.name }
-          : undefined,
-        distance_units: item.distance_units
-          ? { name: item.distance_units.name }
-          : undefined,
-      }));
-
-      setTodaySets(workouts);
-    } catch (err) {
-      console.error('Error fetching today sets:', err);
-    }
+  const updateTodaySetsFromCache = () => {
+    const dateStr = formatDate(date);
+    const sets = workouts.filter(w => 
+      w.exercise === exercise.id && w.date === dateStr
+    );
+    setTodaySets(sets);
   };
 
   const handleSaveSet = async () => {
@@ -183,7 +137,7 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
         toast.success('Set saved');
       }
 
-      await fetchTodaySets();
+      updateTodaySetsFromCache();
 
       setCurrentSet({
         weight: currentSet.weight,
@@ -231,7 +185,7 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
       if (error) throw error;
 
       toast.success('Set deleted');
-      await fetchTodaySets();
+      updateTodaySetsFromCache();
 
       if (editingSetId === setId) {
         setEditingSetId(null);

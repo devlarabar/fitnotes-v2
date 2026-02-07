@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Dumbbell } from 'lucide-react';
-import { useWorkoutHistory } from '@/app/hooks/use-workout-history';
+import { useWorkoutData } from '@/app/contexts/workout-data-context';
 import { motion } from 'motion/react';
 import { Button, Card, SectionHeader } from './ui';
 
@@ -18,7 +18,11 @@ interface Props {
 
 export default function Calendar({ onDateSelect }: Props) {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const { loading, getWorkoutDates } = useWorkoutHistory();
+  const { workouts, loading } = useWorkoutData();
+
+  const getWorkoutDates = (): Set<string> => {
+    return new Set(workouts.map(w => w.date));
+  };
 
   const workoutDates = getWorkoutDates();
 
