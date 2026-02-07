@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Dumbbell, Trash2, Save, X, Trophy, ChevronRight } from 'lucide-react';
+import { Dumbbell, Trash2, Save, X, Trophy, ChevronRight, MessageSquare } from 'lucide-react';
 import { Workout, Exercise, WeightUnit, DistanceUnit } from '@/app/lib/schema';
 import { Button, Card } from './ui';
+import { Textarea } from './ui/form/textarea';
 import { SetInputs } from './set-inputs';
 import { supabase } from '@/app/lib/supabase';
 import { toast } from 'sonner';
@@ -39,6 +40,7 @@ export function WorkoutDayView({
   const [editingSetId, setEditingSetId] = useState<number | null>(null);
   const [editedSet, setEditedSet] = useState<Workout | null>(null);
   const [saving, setSaving] = useState(false);
+  const [expandedComments, setExpandedComments] = useState<Set<number>>(new Set());
 
   const handleStartEdit = (set: Workout) => {
     setEditingSetId(set.id);
@@ -152,86 +154,106 @@ export function WorkoutDayView({
                     <div key={set.id} className="group">
                       {isEditing ? (
                         // Edit Mode
-                        <div className="flex items-end gap-3 p-2 bg-violet-500/10 rounded-xl border border-violet-500/30">
-                          <div className="w-6 pb-3 text-center text-xs font-bold text-violet-400">{idx + 1}</div>
-                          <SetInputs
-                            set={{
-                              id: displaySet.id,
-                              weight: displaySet.weight,
-                              weight_unit: displaySet.weight_unit,
-                              reps: displaySet.reps,
-                              distance: displaySet.distance,
-                              distance_unit: displaySet.distance_unit,
-                              time: displaySet.time
-                            }}
-                            measurementType={measurementType}
-                            weightUnits={weightUnits}
-                            distanceUnits={distanceUnits}
-                            onUpdate={handleUpdateEditedSet}
-                          />
-                          <div className="flex gap-2 mb-1.5">
-                            <Button
-                              variant="ghost"
-                              onClick={handleCancelEdit}
-                              className="p-2 h-auto text-slate-500 hover:text-white"
-                              disabled={saving}
-                            >
-                              <X size={16} />
-                            </Button>
-                            <Button
-                              variant="primary"
-                              onClick={handleSaveSet}
-                              className="p-2 h-auto"
-                              disabled={saving}
-                            >
-                              {saving ? (
-                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                              ) : (
-                                <Save size={16} />
-                              )}
-                            </Button>
+                        <div className="space-y-2 p-2 bg-violet-500/10 rounded-xl border border-violet-500/30">
+                          <div className="flex items-end gap-3">
+                            <div className="w-6 pb-3 text-center text-xs font-bold text-violet-400">{idx + 1}</div>
+                            <SetInputs
+                              set={{
+                                id: displaySet.id,
+                                weight: displaySet.weight,
+                                weight_unit: displaySet.weight_unit,
+                                reps: displaySet.reps,
+                                distance: displaySet.distance,
+                                distance_unit: displaySet.distance_unit,
+                                time: displaySet.time
+                              }}
+                              measurementType={measurementType}
+                              weightUnits={weightUnits}
+                              distanceUnits={distanceUnits}
+                              onUpdate={handleUpdateEditedSet}
+                            />
+                            <div className="flex gap-2 mb-1.5">
+                              <Button
+                                variant="ghost"
+                                onClick={handleCancelEdit}
+                                className="p-2 h-auto text-slate-500 hover:text-white"
+                                disabled={saving}
+                              >
+                                <X size={16} />
+                              </Button>
+                              <Button
+                                variant="primary"
+                                onClick={handleSaveSet}
+                                className="p-2 h-auto"
+                                disabled={saving}
+                              >
+                                {saving ? (
+                                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                ) : (
+                                  <Save size={16} />
+                                )}
+                              </Button>
+                            </div>
                           </div>
+                          <Textarea
+                            placeholder="Add a note (optional)"
+                            value={displaySet.comment || ''}
+                            onChange={(e) => handleUpdateEditedSet({ comment: e.target.value })}
+                            className="w-full max-w-full bg-bg-tertiary border-border-primary text-text-primary"
+                          />
                         </div>
                       ) : (
                         // View Mode
-                        <div
-                          className="flex items-center gap-3 p-2 bg-slate-900/50 rounded-xl cursor-pointer hover:bg-slate-900 transition-colors"
-                          onClick={() => handleStartEdit(set)}
-                        >
-                          <div className="w-6 h-6 rounded-lg bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-500">
-                            {idx + 1}
-                          </div>
-                          <div className="flex-1 flex gap-4 text-sm">
-                            {set.weight !== null && set.weight !== undefined && (
-                              <span className="font-bold text-violet-400">
-                                {set.weight} {set.weight_units?.name}
-                              </span>
-                            )}
-                            {set.reps !== null && set.reps !== undefined && (
-                              <span className="text-slate-300">{set.reps} reps</span>
-                            )}
-                            {set.distance !== null && set.distance !== undefined && (
-                              <span className="font-bold text-violet-400">
-                                {set.distance} {set.distance_units?.name}
-                              </span>
-                            )}
-                            {set.time && (
-                              <span className="text-slate-300">{set.time}</span>
-                            )}
-                          </div>
-                          {set.is_pr && (
-                            <Trophy size={16} className="text-yellow-500" />
-                          )}
-                          <Button
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteSet(set.id);
-                            }}
-                            className="p-2 h-auto text-slate-700 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                        <div className="bg-slate-900/50 rounded-xl">
+                          <div
+                            className="flex items-center gap-3 p-2 cursor-pointer hover:bg-slate-900 transition-colors"
+                            onClick={() => handleStartEdit(set)}
                           >
-                            <Trash2 size={16} />
-                          </Button>
+                            <div className="w-6 h-6 rounded-lg bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-500">
+                              {idx + 1}
+                            </div>
+                            <div className="flex-1 flex items-center gap-4 text-sm min-w-0">
+                              <div className="flex gap-4">
+                                {set.weight !== null && set.weight !== undefined && (
+                                  <span className="font-bold text-violet-400">
+                                    {set.weight} {set.weight_units?.name}
+                                  </span>
+                                )}
+                                {set.reps !== null && set.reps !== undefined && (
+                                  <span className="text-slate-300">{set.reps} reps</span>
+                                )}
+                                {set.distance !== null && set.distance !== undefined && (
+                                  <span className="font-bold text-violet-400">
+                                    {set.distance} {set.distance_units?.name}
+                                  </span>
+                                )}
+                                {set.time && (
+                                  <span className="text-slate-300">{set.time}</span>
+                                )}
+                              </div>
+                              {set.comment && (
+                                <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                  <MessageSquare size={12} className="text-slate-600 flex-shrink-0" />
+                                  <span className="text-xs text-slate-500 truncate">
+                                    {set.comment}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            {set.is_pr && (
+                              <Trophy size={16} className="text-yellow-500 flex-shrink-0" />
+                            )}
+                            <Button
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteSet(set.id);
+                              }}
+                              className="p-2 h-auto text-slate-700 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          </div>
                         </div>
                       )}
                     </div>
