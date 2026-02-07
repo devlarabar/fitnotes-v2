@@ -1,5 +1,5 @@
 import React from 'react';
-import { Workout, Exercise, WeightUnit, DistanceUnit } from '@/app/lib/schema';
+import { Workout, Exercise } from '@/app/lib/schema';
 import { Card } from './ui';
 import { ExerciseGroup } from './workout/exercise-group';
 

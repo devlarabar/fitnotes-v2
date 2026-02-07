@@ -44,8 +44,11 @@ export function DayWorkouts({
   if (groupedWorkouts.length === 0 && showEmptyState) {
     console.log('Rendering empty state with button');
     return (
-      <Card className="py-20 flex flex-col items-center justify-center text-center border-dashed border-2 bg-transparent">
-        <p className="text-text-muted max-w-50">No workouts recorded for this day</p>
+      <Card className={`py-20 flex flex-col items-center justify-center 
+        text-center border-dashed border-2 bg-transparent`}>
+        <p className="text-text-muted max-w-50">
+          No workouts recorded for this day
+        </p>
         <Button variant="secondary" onClick={onOpenSelector} className="mt-6">
           Browse Exercises
         </Button>

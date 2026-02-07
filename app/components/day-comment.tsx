@@ -100,7 +100,8 @@ export function DayComment({ date, initialComment, onUpdate }: Props) {
             placeholder="Add a note for this day..."
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
-            className="bg-bg-tertiary border-border-primary text-text-primary resize-none"
+            className={`bg-bg-tertiary border-border-primary text-text-primary 
+              resize-none`}
             autoFocus
           />
           <div className="flex gap-2">
@@ -139,15 +140,18 @@ export function DayComment({ date, initialComment, onUpdate }: Props) {
           onClick={handleStartEdit}
         >
           <MessageSquare size={16} className="text-text-dim mt-0.5 shrink-0" />
-          <p className="flex-1 text-sm text-text-secondary italic">{initialComment.comment}</p>
+          <p className="flex-1 text-sm text-text-secondary italic">
+            {initialComment.comment}
+          </p>
         </div>
       ) : (
         <button
           onClick={handleStartEdit}
-          className="w-full h-full flex items-center justify-center gap-2 text-text-dim hover:text-text-secondary transition-colors"
+          className={`w-full h-full flex items-center justify-center 
+            gap-2 text-text-dim hover:text-text-secondary transition-colors`}
         >
           <MessageSquare size={16} />
-          <span className="text-sm">Add day note</span>
+          <span className="text-sm hover:cursor-pointer">Add day note</span>
         </button>
       )}
     </Card>

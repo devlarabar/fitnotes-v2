@@ -106,8 +106,6 @@ export function WorkoutPage({ initialDate, onDateChange }: Props = {}) {
       <ExerciseTracker
         exercise={trackingExercise}
         date={viewDate}
-        weightUnits={weightUnits}
-        distanceUnits={distanceUnits}
         onSaveSet={saveSetToSupabase}
         onBack={() => {
           setTrackingExercise(null);

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Trash2, Save, Trophy, X } from 'lucide-react';
-import { Exercise, WeightUnit, DistanceUnit, Workout } from '@/app/lib/schema';
-import { Button, Card, Badge, SpinnerInline, SetNumberBadge } from '@/app/components/ui';
-import { Textarea } from '@/app/components/ui/form/textarea';
-import { SetInputs } from '@/app/components/set-inputs';
+import { Exercise, Workout } from '@/app/lib/schema';
+import { Card } from '@/app/components/ui';
+import { TrackerHeader } from './tracker-header';
+import { SetForm } from './set-form';
+import { TodaySetsList } from './today-sets-list';
 import { ExerciseHistory } from './exercise-history';
 import { supabase } from '@/app/lib/supabase';
 import { toast } from 'sonner';
+import { useWorkout } from '@/app/hooks/use-workout';
 
 interface LocalSet {
   weight?: number;
@@ -21,20 +22,17 @@ interface LocalSet {
 interface Props {
   exercise: Exercise;
   date: Date;
-  weightUnits: WeightUnit[];
-  distanceUnits: DistanceUnit[];
-  onSaveSet: (exerciseId: number, categoryId: number, set: any, date: Date) => Promise<number | null>;
+  onSaveSet: (
+    exerciseId: number,
+    categoryId: number,
+    set: any,
+    date: Date,
+  ) => Promise<number | null>;
   onBack: () => void;
 }
 
-export function ExerciseTracker({
-  exercise,
-  date,
-  weightUnits,
-  distanceUnits,
-  onSaveSet,
-  onBack
-}: Props) {
+export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
+  const { weightUnits, distanceUnits } = useWorkout();
   const [activeTab, setActiveTab] = useState<'sets' | 'history'>('sets');
   const [currentSet, setCurrentSet] = useState<LocalSet>({
     weight: 0,
@@ -48,15 +46,20 @@ export function ExerciseTracker({
   const [saving, setSaving] = useState(false);
   const [todaySets, setTodaySets] = useState<Workout[]>([]);
   const [editingSetId, setEditingSetId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
 
   const measurementType = exercise.measurement_type?.name;
 
-  // Fetch last set data and today's sets on mount
   useEffect(() => {
     fetchLastSetData();
     fetchTodaySets();
   }, [exercise.id, date]);
+
+  const formatDate = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   const fetchLastSetData = async () => {
     try {
@@ -77,7 +80,7 @@ export function ExerciseTracker({
           distance: data.distance || 0,
           distance_unit: data.distance_unit || distanceUnits[0]?.id || 1,
           time: data.time || '00:00',
-          comment: '' // Don't carry over comments
+          comment: ''
         });
       }
     } catch (err) {
@@ -87,7 +90,6 @@ export function ExerciseTracker({
 
   const fetchTodaySets = async () => {
     try {
-      setLoading(true);
       const dateStr = formatDate(date);
       const { data, error } = await supabase
         .from('workouts')
@@ -123,30 +125,24 @@ export function ExerciseTracker({
         time: item.time,
         comment: item.comment,
         is_pr: item.is_pr,
-        weight_units: item.weight_units ? { name: item.weight_units.name } : undefined,
-        distance_units: item.distance_units ? { name: item.distance_units.name } : undefined
+        weight_units: item.weight_units
+          ? { name: item.weight_units.name }
+          : undefined,
+        distance_units: item.distance_units
+          ? { name: item.distance_units.name }
+          : undefined,
       }));
 
       setTodaySets(workouts);
     } catch (err) {
       console.error('Error fetching today sets:', err);
-    } finally {
-      setLoading(false);
     }
-  };
-
-  const formatDate = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
   };
 
   const handleSaveSet = async () => {
     setSaving(true);
     try {
       if (editingSetId) {
-        // Update existing set
         const { error } = await supabase
           .from('workouts')
           .update({
@@ -164,7 +160,6 @@ export function ExerciseTracker({
         toast.success('Set updated');
         setEditingSetId(null);
       } else {
-        // Create new set
         const setId = await onSaveSet(
           exercise.id,
           exercise.category || 1,
@@ -179,10 +174,8 @@ export function ExerciseTracker({
         toast.success('Set saved');
       }
 
-      // Refresh today's sets
       await fetchTodaySets();
-      
-      // Keep current values for next set, but clear comment
+
       setCurrentSet({
         weight: currentSet.weight,
         weight_unit: currentSet.weight_unit,
@@ -214,7 +207,7 @@ export function ExerciseTracker({
 
   const handleCancelEdit = () => {
     setEditingSetId(null);
-    fetchLastSetData(); // Reset to last set data
+    fetchLastSetData();
   };
 
   const handleDeleteSet = async (setId: number) => {
@@ -230,7 +223,7 @@ export function ExerciseTracker({
 
       toast.success('Set deleted');
       await fetchTodaySets();
-      
+
       if (editingSetId === setId) {
         setEditingSetId(null);
         fetchLastSetData();
@@ -241,48 +234,27 @@ export function ExerciseTracker({
     }
   };
 
-  const handleUpdateSet = (updates: any) => {
-    setCurrentSet(prev => ({ ...prev, ...updates }));
-  };
-
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={onBack} className="p-2">
-          <ArrowLeft size={24} />
-        </Button>
-        <div className="flex-1">
-          <h1 className="text-2xl font-black text-white">{exercise.name}</h1>
-          <div className="flex gap-2 mt-1">
-            <Badge variant="outline">{exercise.categories?.name}</Badge>
-            {measurementType && (
-              <Badge variant="vivid">{measurementType}</Badge>
-            )}
-          </div>
-        </div>
-      </div>
+      <TrackerHeader exercise={exercise} onBack={onBack} />
 
-      {/* Tabs */}
       <Card className="p-0 overflow-hidden">
         <div className="flex border-b border-border-primary">
           <button
             onClick={() => setActiveTab('sets')}
-            className={`flex-1 py-3 text-sm font-bold transition-colors ${
-              activeTab === 'sets'
-                ? 'text-accent-secondary border-b-2 border-accent-primary'
-                : 'text-text-dim hover:text-text-secondary hover:cursor-pointer'
-            }`}
+            className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === 'sets'
+              ? 'text-accent-secondary border-b-2 border-accent-primary'
+              : 'text-text-dim hover:text-text-secondary hover:cursor-pointer'
+              }`}
           >
             Track Set
           </button>
           <button
             onClick={() => setActiveTab('history')}
-            className={`flex-1 py-3 text-sm font-bold transition-colors ${
-              activeTab === 'history'
-                ? 'text-accent-secondary border-b-2 border-accent-primary'
-                : 'text-text-dim hover:text-text-secondary hover:cursor-pointer'
-            }`}
+            className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === 'history'
+              ? 'text-accent-secondary border-b-2 border-accent-primary'
+              : 'text-text-dim hover:text-text-secondary hover:cursor-pointer'
+              }`}
           >
             History
           </button>
@@ -291,123 +263,22 @@ export function ExerciseTracker({
         <div className="p-6">
           {activeTab === 'sets' ? (
             <div className="space-y-6">
-              <div className="space-y-3">
-                <div className="flex items-end gap-3">
-                  <SetInputs
-                    set={{
-                      id: 'current',
-                      ...currentSet
-                    }}
-                    measurementType={measurementType}
-                    weightUnits={weightUnits}
-                    distanceUnits={distanceUnits}
-                    onUpdate={handleUpdateSet}
-                  />
-                </div>
-                
-                <Textarea
-                  placeholder="Add a note (optional)"
-                  value={currentSet.comment || ''}
-                  onChange={(e) => handleUpdateSet({ comment: e.target.value })}
-                  className="bg-bg-tertiary border-border-primary text-text-primary"
-                />
-              </div>
+              <SetForm
+                set={currentSet}
+                measurementType={measurementType}
+                isEditing={!!editingSetId}
+                saving={saving}
+                onUpdate={(updates) => setCurrentSet(prev => ({ ...prev, ...updates }))}
+                onSave={handleSaveSet}
+                onCancel={editingSetId ? handleCancelEdit : undefined}
+              />
 
-              <div className="flex gap-2">
-                {editingSetId && (
-                  <Button
-                    variant="ghost"
-                    size="lg"
-                    onClick={handleCancelEdit}
-                    disabled={saving}
-                    className="flex-1"
-                  >
-                    <X size={18} />
-                    Cancel
-                  </Button>
-                )}
-                <Button
-                  variant="accent"
-                  size="lg"
-                  onClick={handleSaveSet}
-                  disabled={saving}
-                  className={editingSetId ? 'flex-1' : 'w-full'}
-                >
-                {saving ? (
-                  <>
-                    <SpinnerInline />
-                    Saving...
-                  </>
-                ) : (
-                    <>
-                      <Save size={18} />
-                      {editingSetId ? 'Update Set' : 'Save Set'}
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              {/* Today's Sets */}
-              {todaySets.length > 0 && (
-                <div className="space-y-2 pt-4 border-t border-border-primary">
-                  <p className="text-xs text-text-dim font-bold uppercase tracking-wider">
-                    Today's Sets ({todaySets.length})
-                  </p>
-                  <div className="space-y-2">
-                    {todaySets.map((set, idx) => (
-                      <div
-                        key={set.id}
-                        className={`group rounded-xl cursor-pointer transition-colors ${
-                          editingSetId === set.id
-                            ? 'bg-violet-500/20 border border-violet-500/50'
-                            : 'bg-bg-tertiary/30 hover:bg-bg-tertiary/50'
-                        }`}
-                        onClick={() => handleEditSet(set)}
-                      >
-                        <div className="flex items-center gap-3 p-3"                        >
-                          <SetNumberBadge number={idx + 1} />
-                          <div className="flex-1 flex gap-3 text-sm">
-                            {set.weight !== null && set.weight !== undefined && (
-                              <span className="font-bold text-accent-secondary">
-                                {set.weight} {set.weight_units?.name}
-                              </span>
-                            )}
-                            {set.reps !== null && set.reps !== undefined && (
-                              <span className="text-text-secondary">{set.reps} reps</span>
-                            )}
-                            {set.distance !== null && set.distance !== undefined && (
-                              <span className="font-bold text-accent-secondary">
-                                {set.distance} {set.distance_units?.name}
-                              </span>
-                            )}
-                            {set.time && (
-                              <span className="text-text-secondary">{set.time}</span>
-                            )}
-                          </div>
-                          {set.is_pr && (
-                            <Trophy size={16} className="text-yellow-500" />
-                          )}
-                          <Button
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteSet(set.id);
-                            }}
-                            className="p-2 h-auto text-slate-700 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <Trash2 size={16} />
-                          </Button>
-                        </div>
-                        {set.comment && (
-                          <div className="px-3 pb-3 pt-0">
-                            <p className="text-xs text-text-muted italic">{set.comment}</p>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <TodaySetsList
+                sets={todaySets}
+                editingSetId={editingSetId}
+                onEdit={handleEditSet}
+                onDelete={handleDeleteSet}
+              />
             </div>
           ) : (
             <ExerciseHistory exerciseId={exercise.id} />
