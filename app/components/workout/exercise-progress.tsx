@@ -44,14 +44,22 @@ export function ExerciseProgress({ exerciseId, measurementType }: Props) {
     <div className="space-y-6">
       <PRStatCard stats={prStats} />
 
-      <ProgressControls
-        timeRange={timeRange}
-        chartType={chartType}
-        onTimeRangeChange={setTimeRange}
-        onChartTypeChange={setChartType}
-      />
+      <div className="space-y-4">
+        <ProgressControls
+          timeRange={timeRange}
+          chartType={chartType}
+          onTimeRangeChange={setTimeRange}
+          onChartTypeChange={setChartType}
+        />
 
-      <ProgressChart data={chartData} chartType={chartType} />
+        {chartData.length > 0 ? (
+          <ProgressChart data={chartData} chartType={chartType} />
+        ) : (
+          <div className="text-center py-10 text-text-muted text-sm">
+            No data for selected time range
+          </div>
+        )}
+      </div>
     </div>
   );
 }

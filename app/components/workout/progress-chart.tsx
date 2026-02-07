@@ -35,6 +35,16 @@ export function ProgressChart({ data, chartType }: Props) {
     color: '#f8fafc'
   };
 
+  if (!data || data.length === 0) {
+    return (
+      <Card className="p-6">
+        <div className="h-64 flex items-center justify-center">
+          <p className="text-text-muted text-sm">No data available</p>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card className="p-6">
       <div className="h-64">

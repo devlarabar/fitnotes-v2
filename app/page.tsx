@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { SettingsPage } from '@/app/components/settings-page';
+import { ProgressPage } from '@/app/components/progress-page';
 import { AnimatePresence, motion } from 'motion/react';
 import { WorkoutPage } from './components/workout/workout-page';
 import { MobileNav, Sidebar } from './components/navigation';
@@ -30,15 +31,25 @@ export default function HomePage() {
   const renderView = () => {
     switch (activeTab) {
       case 'workout':
-        return <WorkoutPage initialDate={selectedDate} onDateChange={() => setSelectedDate(null)} />;
+        return (
+          <WorkoutPage 
+            initialDate={selectedDate} 
+            onDateChange={() => setSelectedDate(null)} 
+          />
+        );
       case 'history':
         return <CalendarComponent onDateSelect={handleDateSelect} />;
       case 'progress':
-        return <div>Progress coming soon</div>;
+        return <ProgressPage />;
       case 'settings':
         return <SettingsPage />;
       default:
-        return <WorkoutPage initialDate={selectedDate} onDateChange={() => setSelectedDate(null)} />;
+        return (
+          <WorkoutPage 
+            initialDate={selectedDate} 
+            onDateChange={() => setSelectedDate(null)} 
+          />
+        );
     }
   };
 
