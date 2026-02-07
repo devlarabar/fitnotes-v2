@@ -81,3 +81,7 @@ export interface DayComment {
   date: string
   comment: string
 }
+
+export interface Settings {
+  signups_enabled: boolean
+}

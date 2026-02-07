@@ -1,15 +1,28 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AuthForm } from '@/app/components/auth/auth-form';
-import { signIn, signUp } from '@/app/lib/auth';
+import { signIn, signUp, getSettings } from '@/app/lib/auth';
 import { toast } from 'sonner';
 import { Dumbbell } from 'lucide-react';
 
 export default function AuthPage() {
   const router = useRouter();
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [signupsEnabled, setSignupsEnabled] = useState(true);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchSettings() {
+      const settings = await getSettings();
+      if (settings) {
+        setSignupsEnabled(settings.signups_enabled);
+      }
+      setLoading(false);
+    }
+    fetchSettings();
+  }, []);
 
   const handleAuth = async (email: string, password: string) => {
     const { data, error } = mode === 'signin'
@@ -45,11 +58,25 @@ export default function AuthPage() {
           <p className="text-text-muted">Track your fitness journey</p>
         </div>
 
-        <AuthForm
-          mode={mode}
-          onSubmit={handleAuth}
-          onToggleMode={() => setMode(m => m === 'signin' ? 'signup' : 'signin')}
-        />
+        {loading ? (
+          <div className="text-center text-text-muted">Loading...</div>
+        ) : (
+          <>
+            <AuthForm
+              mode={mode}
+              onSubmit={handleAuth}
+              onToggleMode={() => setMode(m => m === 'signin' ? 'signup' : 'signin')}
+              signupsEnabled={signupsEnabled}
+            />
+            {!signupsEnabled && mode === 'signup' && (
+              <div className="text-center mt-4 p-4 bg-bg-secondary border border-border-primary rounded-xl">
+                <p className="text-text-muted text-sm">
+                  Signups are currently disabled. Please contact the administrator.
+                </p>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

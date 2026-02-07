@@ -6,9 +6,10 @@ interface Props {
   mode: 'signin' | 'signup';
   onSubmit: (email: string, password: string) => Promise<void>;
   onToggleMode: () => void;
+  signupsEnabled?: boolean;
 }
 
-export function AuthForm({ mode, onSubmit, onToggleMode }: Props) {
+export function AuthForm({ mode, onSubmit, onToggleMode, signupsEnabled = true }: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -79,7 +80,7 @@ export function AuthForm({ mode, onSubmit, onToggleMode }: Props) {
           type="submit"
           variant="accent"
           size="lg"
-          disabled={loading}
+          disabled={loading || (mode === 'signup' && !signupsEnabled)}
           className="w-full"
         >
           {loading ? (
@@ -93,19 +94,21 @@ export function AuthForm({ mode, onSubmit, onToggleMode }: Props) {
         </Button>
       </form>
 
-      <div className="mt-6 text-center">
-        <button
-          type="button"
-          onClick={onToggleMode}
-          className="text-sm text-text-muted hover:text-violet-400 
-            transition-colors"
-        >
-          {mode === 'signin' 
-            ? "Don't have an account? Sign up" 
-            : 'Already have an account? Sign in'
-          }
-        </button>
-      </div>
+      {signupsEnabled && (
+        <div className="mt-6 text-center">
+          <button
+            type="button"
+            onClick={onToggleMode}
+            className="text-sm text-text-muted hover:text-violet-400 
+              transition-colors hover:cursor-pointer"
+          >
+            {mode === 'signin' 
+              ? "Don't have an account? Sign up" 
+              : 'Already have an account? Sign in'
+            }
+          </button>
+        </div>
+      )}
     </Card>
   );
 }
