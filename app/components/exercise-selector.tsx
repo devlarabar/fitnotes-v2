@@ -15,11 +15,13 @@ interface Props {
 export function ExerciseSelector({ exercises, category, onSelect, onBack, onClose }: Props) {
   const [search, setSearch] = useState('');
 
-  const filteredExercises = exercises.filter(e => {
-    const matchesSearch = e.name.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = e.category === category.id;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredExercises = exercises
+    .filter(e => {
+      const matchesSearch = e.name.toLowerCase().includes(search.toLowerCase());
+      const matchesCategory = e.category === category.id;
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const handleSelect = (exercise: Exercise) => {
     onSelect(exercise);

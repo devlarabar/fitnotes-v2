@@ -11,6 +11,8 @@ interface Props {
 }
 
 export function CategorySelector({ categories, onSelect, onClose }: Props) {
+  const sortedCategories = [...categories].sort((a, b) => a.name.localeCompare(b.name));
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -21,7 +23,7 @@ export function CategorySelector({ categories, onSelect, onClose }: Props) {
       </div>
 
       <div className="space-y-3">
-        {categories.map(category => (
+        {sortedCategories.map(category => (
           <Card
             key={category.id}
             onClick={() => onSelect(category)}
