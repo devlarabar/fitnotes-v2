@@ -1,11 +1,7 @@
-import React, { useState } from 'react';
-import { Dumbbell, Trash2, Save, X, Trophy, ChevronRight, MessageSquare } from 'lucide-react';
+import React from 'react';
 import { Workout, Exercise, WeightUnit, DistanceUnit } from '@/app/lib/schema';
-import { Button, Card, SpinnerInline, SetNumberBadge, IconContainer } from './ui';
-import { Textarea } from './ui/form/textarea';
-import { SetInputs } from './set-inputs';
-import { supabase } from '@/app/lib/supabase';
-import { toast } from 'sonner';
+import { Card } from './ui';
+import { ExerciseGroup } from './workout/exercise-group';
 
 interface GroupedWorkout {
   exercise: {
@@ -20,95 +16,19 @@ interface Props {
   date: string;
   groupedWorkouts: GroupedWorkout[];
   exercises: Exercise[];
-  weightUnits: WeightUnit[];
-  distanceUnits: DistanceUnit[];
   onUpdate?: () => void;
   showTitle?: boolean;
-  onExerciseClick?: (exerciseId: number) => void;
+  onExerciseClick: (exerciseId: number) => void;
 }
 
 export function WorkoutDayView({
   date,
   groupedWorkouts,
   exercises,
-  weightUnits,
-  distanceUnits,
   onUpdate,
   showTitle = true,
   onExerciseClick
 }: Props) {
-  const [editingSetId, setEditingSetId] = useState<number | null>(null);
-  const [editedSet, setEditedSet] = useState<Workout | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [expandedComments, setExpandedComments] = useState<Set<number>>(new Set());
-
-  const handleStartEdit = (set: Workout) => {
-    setEditingSetId(set.id);
-    setEditedSet({ ...set });
-  };
-
-  const handleCancelEdit = () => {
-    setEditingSetId(null);
-    setEditedSet(null);
-  };
-
-  const handleSaveSet = async () => {
-    if (!editedSet) return;
-
-    setSaving(true);
-    try {
-      const { error } = await supabase
-        .from('workouts')
-        .update({
-          weight: editedSet.weight || null,
-          weight_unit: editedSet.weight_unit || null,
-          reps: editedSet.reps || null,
-          distance: editedSet.distance || null,
-          distance_unit: editedSet.distance_unit || null,
-          time: editedSet.time || null,
-          comment: editedSet.comment || null
-        })
-        .eq('id', editedSet.id);
-
-      if (error) throw error;
-
-      toast.success('Set updated');
-      if (onUpdate) onUpdate();
-      setEditingSetId(null);
-      setEditedSet(null);
-    } catch (err) {
-      console.error('Error saving set:', err);
-      toast.error('Failed to save');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDeleteSet = async (setId: number) => {
-    if (!confirm('Delete this set?')) return;
-
-    try {
-      const { error } = await supabase
-        .from('workouts')
-        .delete()
-        .eq('id', setId);
-
-      if (error) throw error;
-
-      toast.success('Set deleted');
-      if (onUpdate) onUpdate();
-    } catch (err) {
-      console.error('Error deleting set:', err);
-      toast.error('Failed to delete');
-    }
-  };
-
-  const handleUpdateEditedSet = (updates: any) => {
-    if (editedSet) {
-      setEditedSet({ ...editedSet, ...updates });
-    }
-  };
-
   return (
     <Card className="p-6">
       {showTitle && (
@@ -128,133 +48,13 @@ export function WorkoutDayView({
           const measurementType = exerciseData?.measurement_type?.name;
 
           return (
-            <div key={group.exercise.id} className="bg-slate-800/30 rounded-2xl p-4 border border-slate-800">
-              <div 
-                className={`flex items-center gap-3 mb-3 ${onExerciseClick ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
-                onClick={() => onExerciseClick?.(group.exercise.id)}
-              >
-                <IconContainer>
-                  <Dumbbell size={18} />
-                </IconContainer>
-                <div className="flex-1">
-                  <h4 className="font-bold text-white">{group.exercise.name}</h4>
-                  <p className="text-xs text-slate-500 uppercase tracking-wider">{group.exercise.category}</p>
-                </div>
-                {onExerciseClick && (
-                  <ChevronRight size={20} className="text-slate-600" />
-                )}
-              </div>
-
-              <div className="space-y-2">
-                {group.sets.map((set, idx) => {
-                  const isEditing = editingSetId === set.id;
-                  const displaySet = isEditing && editedSet ? editedSet : set;
-
-                  return (
-                    <div key={set.id} className="group">
-                      {isEditing ? (
-                        // Edit Mode
-                        <div className="space-y-2 p-2 bg-violet-500/10 rounded-xl border border-violet-500/30">
-                          <div className="flex items-end gap-3">
-                            <div className="w-6 pb-3 text-center text-xs font-bold text-violet-400">{idx + 1}</div>
-                            <SetInputs
-                              set={{
-                                id: displaySet.id,
-                                weight: displaySet.weight,
-                                weight_unit: displaySet.weight_unit,
-                                reps: displaySet.reps,
-                                distance: displaySet.distance,
-                                distance_unit: displaySet.distance_unit,
-                                time: displaySet.time
-                              }}
-                              measurementType={measurementType}
-                              weightUnits={weightUnits}
-                              distanceUnits={distanceUnits}
-                              onUpdate={handleUpdateEditedSet}
-                            />
-                            <div className="flex gap-2 mb-1.5">
-                              <Button
-                                variant="ghost"
-                                onClick={handleCancelEdit}
-                                className="p-2 h-auto text-slate-500 hover:text-white"
-                                disabled={saving}
-                              >
-                                <X size={16} />
-                              </Button>
-                              <Button
-                                variant="primary"
-                                onClick={handleSaveSet}
-                                className="p-2 h-auto"
-                              disabled={saving}
-                            >
-                              {saving ? <SpinnerInline /> : <Save size={16} />}
-                              </Button>
-                            </div>
-                          </div>
-                          <Textarea
-                            placeholder="Add a note (optional)"
-                            value={displaySet.comment || ''}
-                            onChange={(e) => handleUpdateEditedSet({ comment: e.target.value })}
-                            className="w-full max-w-full bg-bg-tertiary border-border-primary text-text-primary"
-                          />
-                        </div>
-                      ) : (
-                        // View Mode
-                        <div className="bg-slate-900/50 rounded-xl">
-                          <div
-                            className="flex items-center gap-3 p-2 cursor-pointer hover:bg-slate-900 transition-colors"
-                            onClick={() => handleStartEdit(set)}
-                          >
-                            <SetNumberBadge number={idx + 1} className="bg-slate-800" />
-                            <div className="flex-1 flex items-center gap-4 text-sm min-w-0">
-                              <div className="flex gap-4">
-                                {set.weight !== null && set.weight !== undefined && (
-                                  <span className="font-bold text-violet-400">
-                                    {set.weight} {set.weight_units?.name}
-                                  </span>
-                                )}
-                                {set.reps !== null && set.reps !== undefined && (
-                                  <span className="text-slate-300">{set.reps} reps</span>
-                                )}
-                                {set.distance !== null && set.distance !== undefined && (
-                                  <span className="font-bold text-violet-400">
-                                    {set.distance} {set.distance_units?.name}
-                                  </span>
-                                )}
-                                {set.time && (
-                                  <span className="text-slate-300">{set.time}</span>
-                                )}
-                              </div>
-                              {set.comment && (
-                                <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                                  <MessageSquare size={12} className="text-slate-600 shrink-0" />
-                                  <span className="text-xs text-slate-500 truncate">
-                                    {set.comment}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                            {set.is_pr && (
-                              <Trophy size={16} className="text-yellow-500 shrink-0" />
-                            )}
-                            <Button
-                              variant="ghost"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteSet(set.id);
-                              }}
-                              className="p-2 h-auto text-slate-700 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <Trash2 size={16} />
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            <ExerciseGroup
+              key={group.exercise.id}
+              group={group}
+              measurementType={measurementType}
+              onExerciseClick={() => onExerciseClick(group.exercise.id)}
+              onUpdate={() => onUpdate?.()}
+            />
           );
         })}
       </div>

@@ -21,7 +21,7 @@ interface Props {
   onUpdate: () => void;
   onOpenSelector?: () => void;
   showEmptyState?: boolean;
-  onExerciseClick?: (exerciseId: number) => void;
+  onExerciseClick: (exerciseId: number) => void;
 }
 
 export function DayWorkouts({
@@ -63,8 +63,6 @@ export function DayWorkouts({
       date={date}
       groupedWorkouts={groupedWorkouts}
       exercises={exercises}
-      weightUnits={weightUnits}
-      distanceUnits={distanceUnits}
       onUpdate={onUpdate}
       showTitle={false}
       onExerciseClick={onExerciseClick}

@@ -216,10 +216,9 @@ export default function Calendar() {
             date={selectedDate}
             groupedWorkouts={getGroupedWorkouts(selectedDate)}
             exercises={exercises}
-            weightUnits={weightUnits}
-            distanceUnits={distanceUnits}
             onUpdate={refetch}
             showTitle={true}
+            onExerciseClick={() => { }}  // No editing on this page
           />
         </motion.div>
       )}
