@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { ArrowLeft, Plus, Trash2, Save } from 'lucide-react';
 import { Exercise, WeightUnit, DistanceUnit } from '@/app/lib/schema';
 import { Button, Card, Badge } from '@/app/components/ui';
-import { SetInputs } from '@/app/components/SetInputs';
-import { ExerciseHistory } from './ExerciseHistory';
+import { SetInputs } from '@/app/components/set-inputs';
+import { ExerciseHistory } from './exercise-history';
 import { toast } from 'sonner';
 
 interface LocalSet {

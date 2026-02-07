@@ -2,7 +2,7 @@ import React from 'react';
 import { X, ChevronRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Category } from '@/app/lib/schema';
-import { Card, Button } from './ui';
+import { Button, Card } from './ui';
 
 interface Props {
   categories: Category[];
@@ -16,7 +16,7 @@ export function CategorySelector({ categories, onSelect, onClose }: Props) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] bg-slate-950 flex flex-col"
+      className="fixed inset-0 z-100 bg-slate-950 flex flex-col"
     >
       <div className="p-4 border-b border-slate-900 flex items-center gap-4">
         <Button variant="ghost" onClick={onClose} className="p-2">

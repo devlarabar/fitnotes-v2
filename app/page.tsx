@@ -2,12 +2,12 @@
 
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { WorkoutPage } from '@/app/components/workout/WorkoutPage';
-import { SettingsPage } from '@/app/components/SettingsPage';
-import { Sidebar, MobileNav } from '@/app/components/Navigation';
+import { SettingsPage } from '@/app/components/settings-page';
 import { AnimatePresence, motion } from 'motion/react';
+import { WorkoutPage } from './components/workout/workout-page';
+import { MobileNav, Sidebar } from './components/Navigation';
 
-const Calendar = dynamic(() => import('@/app/components/Calendar'), {
+const Calendar = dynamic(() => import('@/app/components/calendar'), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center py-20">

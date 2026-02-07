@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Dumbbell } from 'lucide-react';
+import { useWorkoutHistory } from '@/app/hooks/use-workout-history';
+import { useWorkout } from '@/app/hooks/use-workout';
+import { WorkoutDayView } from './workout-day-view';
+import { motion } from 'motion/react';
 import { Button, Card, SectionHeader } from './ui';
-import { useWorkoutHistory } from '@/app/hooks/useWorkoutHistory';
-import { useWorkout } from '@/app/hooks/useWorkout';
-import { WorkoutDayView } from './WorkoutDayView';
-import { motion, AnimatePresence } from 'motion/react';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = [
@@ -132,8 +132,8 @@ export default function Calendar() {
 
   return (
     <div className="space-y-6">
-      <SectionHeader 
-        title="Calendar" 
+      <SectionHeader
+        title="Calendar"
         subtitle="Track your workout history"
       />
 
@@ -143,14 +143,14 @@ export default function Calendar() {
           <Button variant="ghost" onClick={goToPreviousMonth} className="p-2">
             <ChevronLeft size={24} />
           </Button>
-          
+
           <div className="text-center">
             <h2 className="text-2xl font-black text-white">
               {MONTHS[month]} {year}
             </h2>
-            <Button 
-              variant="ghost" 
-              onClick={goToToday} 
+            <Button
+              variant="ghost"
+              onClick={goToToday}
               className="text-xs text-slate-500 hover:text-violet-400 mt-1"
             >
               Today

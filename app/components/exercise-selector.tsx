@@ -12,7 +12,7 @@ interface Props {
   onClose: () => void;
 }
 
-export function ExerciseSelectorWithSupabase({ exercises, category, onSelect, onBack, onClose }: Props) {
+export function ExerciseSelector({ exercises, category, onSelect, onBack, onClose }: Props) {
   const [search, setSearch] = useState('');
 
   const filteredExercises = exercises.filter(e => {
@@ -30,7 +30,7 @@ export function ExerciseSelectorWithSupabase({ exercises, category, onSelect, on
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] bg-slate-950 flex flex-col"
+      className="fixed inset-0 z-100 bg-slate-950 flex flex-col"
     >
       <div className="p-4 border-b border-slate-900 flex items-center gap-4">
         <Button variant="ghost" onClick={onBack} className="p-2">

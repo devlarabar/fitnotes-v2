@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Dumbbell, Trash2, Save, X } from 'lucide-react';
 import { Workout, Exercise, WeightUnit, DistanceUnit } from '@/app/lib/schema';
 import { Button, Card } from './ui';
-import { SetInputs } from './SetInputs';
+import { SetInputs } from './set-inputs';
 import { supabase } from '@/app/lib/supabase';
 import { toast } from 'sonner';
 

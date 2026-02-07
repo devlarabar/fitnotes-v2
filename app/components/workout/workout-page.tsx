@@ -2,14 +2,14 @@
 
 import React, { useState } from 'react';
 import { AnimatePresence } from 'motion/react';
-import { CategorySelector } from '@/app/components/CategorySelector';
-import { ExerciseSelectorWithSupabase } from '@/app/components/ExerciseSelectorWithSupabase';
-import { useWorkout } from '@/app/hooks/useWorkout';
-import { useWorkoutHistory } from '@/app/hooks/useWorkoutHistory';
+import { CategorySelector } from '@/app/components/category-selector';
+import { ExerciseSelector } from '@/app/components/exercise-selector';
+import { useWorkout } from '@/app/hooks/use-workout';
+import { useWorkoutHistory } from '@/app/hooks/use-workout-history';
 import { Category, Exercise } from '@/app/lib/schema';
-import { DayNavigation } from './DayNavigation';
-import { DayWorkouts } from './DayWorkouts';
-import { ExerciseTracker } from './ExerciseTracker';
+import { DayNavigation } from './day-navigation';
+import { DayWorkouts } from './day-workouts';
+import { ExerciseTracker } from './exercise-tracker';
 import { Plus } from 'lucide-react';
 import { Button } from '@/app/components/ui';
 
@@ -146,7 +146,7 @@ export function WorkoutPage() {
           />
         )}
         {isCategorySelectorOpen && selectedCategory && (
-          <ExerciseSelectorWithSupabase
+          <ExerciseSelector
             exercises={exercises}
             category={selectedCategory}
             onBack={() => setSelectedCategory(null)}

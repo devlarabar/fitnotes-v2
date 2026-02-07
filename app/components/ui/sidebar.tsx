@@ -5,10 +5,9 @@ import { Slot } from "@radix-ui/react-slot";
 import { VariantProps, cva } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react";
 
-import { useIsMobile } from "./use-mobile";
+import { useIsMobile } from "../../hooks/use-mobile";
 import { cn } from "./utils";
-import { Button } from "./button";
-import { Input } from "./input";
+import { Button } from "./form/button";
 import { Separator } from "./separator";
 import {
   Sheet,
@@ -24,6 +23,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./tooltip";
+import { Input } from "./form/input";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -291,12 +291,18 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
       onClick={toggleSidebar}
       title="Toggle Sidebar"
       className={cn(
-        "hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] sm:flex",
-        "in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize",
-        "[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize",
-        "hover:group-data-[collapsible=offcanvas]:bg-sidebar group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full",
-        "[[data-side=left][data-collapsible=offcanvas]_&]:-right-2",
-        "[[data-side=right][data-collapsible=offcanvas]_&]:-left-2",
+        `hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 
+        -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 
+        group-data-[side=right]:left-0 after:absolute after:inset-y-0 
+        after:left-1/2 after:w-0.5 sm:flex
+        in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize
+        [[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right]
+        [data-state=collapsed]_&]:cursor-w-resize 
+        hover:group-data-[collapsible=offcanvas]:bg-sidebar 
+        group-data-[collapsible=offcanvas]:translate-x-0 
+        group-data-[collapsible=offcanvas]:after:left-full
+        [[data-side=left][data-collapsible=offcanvas]_&]:-right-2
+        [[data-side=right][data-collapsible=offcanvas]_&]:-left-2`,
         className,
       )}
       {...props}
@@ -569,7 +575,7 @@ function SidebarMenuAction({
         "peer-data-[size=lg]/menu-button:top-2.5",
         "group-data-[collapsible=icon]:hidden",
         showOnHover &&
-          "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0",
+        "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0",
         className,
       )}
       {...props}
@@ -686,8 +692,15 @@ function SidebarMenuSubButton({
       data-size={size}
       data-active={isActive}
       className={cn(
-        "text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground [&>svg]:text-sidebar-accent-foreground flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-hidden focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
-        "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
+        `text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent 
+        hover:text-sidebar-accent-foreground active:bg-sidebar-accent 
+        active:text-sidebar-accent-foreground [&>svg]:text-sidebar-accent-foreground 
+        flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md 
+        px-2 outline-hidden focus-visible:ring-2 disabled:pointer-events-none 
+        disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 
+        [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0
+        data-[active=true]:bg-sidebar-accent 
+        data-[active=true]:text-sidebar-accent-foreground`,
         size === "sm" && "text-xs",
         size === "md" && "text-sm",
         "group-data-[collapsible=icon]:hidden",

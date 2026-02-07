@@ -117,7 +117,7 @@ export function ExerciseHistory({ exerciseId }: Props) {
         )}
       </div>
 
-      <div className="space-y-2 max-h-[400px] overflow-y-auto">
+      <div className="space-y-2 max-h-100 overflow-y-auto">
         {paginatedHistory.map((set, idx) => (
           <div
             key={set.id}
