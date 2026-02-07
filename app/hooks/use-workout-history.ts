@@ -6,16 +6,20 @@ import { Workout, DayComment } from '@/app/lib/schema';
 import { useUser } from '@/app/contexts/user-context';
 
 export function useWorkoutHistory() {
-  const { user } = useUser();
+  const { user, loading: userLoading } = useUser();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [dayComments, setDayComments] = useState<Map<string, DayComment>>(new Map());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.id) {
-      fetchWorkouts();
+    if (!userLoading) {
+      if (user?.id) {
+        fetchWorkouts();
+      } else {
+        setLoading(false);
+      }
     }
-  }, [user?.id]);
+  }, [user?.id, userLoading]);
 
   const fetchWorkouts = async () => {
     try {

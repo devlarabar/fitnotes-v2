@@ -38,7 +38,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       if (error) {
-        console.error('Error fetching user:', error);
+        console.error('Error fetching user from users table:', error);
+        console.warn('⚠️ Users table may not exist yet. Run migrations first.');
         setUser(null);
         return;
       }
