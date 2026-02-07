@@ -185,6 +185,7 @@ export default function Calendar() {
                 onClick={() => handleDateClick(item.date, item.isCurrentMonth)}
                 className={`
                   aspect-square rounded-xl p-2 text-sm font-bold transition-all relative
+                  hover:cursor-pointer
                   ${!item.isCurrentMonth ? 'text-slate-700 cursor-default' : 'text-slate-300 hover:bg-slate-800'}
                   ${todayDate && item.isCurrentMonth ? 'ring-2 ring-violet-500' : ''}
                   ${isSelected ? 'bg-violet-500 text-white' : ''}

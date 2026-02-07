@@ -29,7 +29,7 @@ export function DayNavigation({ date, isToday, onPrevious, onNext, onToday }: Pr
           <Button
             variant="ghost"
             onClick={onToday}
-            className="text-xs text-text-dim hover:text-accent-secondary mt-1"
+            className="text-xs text-text-dim hover:text-accent-secondary mt-1 mx-auto"
           >
             Go to Today
           </Button>
