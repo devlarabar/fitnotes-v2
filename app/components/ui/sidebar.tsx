@@ -24,6 +24,7 @@ import {
   TooltipTrigger,
 } from "./tooltip";
 import { Input } from "./form/input";
+import { useSidebar } from "@/app/hooks/use-sidebar";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -42,16 +43,7 @@ type SidebarContextProps = {
   toggleSidebar: () => void;
 };
 
-const SidebarContext = React.createContext<SidebarContextProps | null>(null);
-
-function useSidebar() {
-  const context = React.useContext(SidebarContext);
-  if (!context) {
-    throw new Error("useSidebar must be used within a SidebarProvider.");
-  }
-
-  return context;
-}
+export const SidebarContext = React.createContext<SidebarContextProps | null>(null);
 
 function SidebarProvider({
   defaultOpen = true,
