@@ -32,11 +32,11 @@ export const Button = ({
   ...props 
 }: ButtonProps) => {
   const variants = {
-    primary: "bg-accent-primary hover:bg-accent-primary text-text-primary shadow-lg shadow-accent-primary/20",
+    primary: "bg-accent-primary hover:bg-accent-primary text-white shadow-lg shadow-accent-primary/20",
     secondary: "bg-bg-tertiary hover:bg-bg-tertiary text-text-secondary border border-border-primary",
     ghost: "bg-transparent hover:bg-bg-tertiary text-text-muted hover:text-text-secondary",
-    accent: "bg-gradient-to-r from-violet-600 to-pink-600 text-text-primary shadow-xl shadow-accent-primary/30",
-    danger: "bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-text-primary border border-red-500/20"
+    accent: "bg-gradient-to-r from-violet-600 to-pink-600 text-white shadow-xl shadow-accent-primary/30",
+    danger: "bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20"
   };
 
   const sizes = {

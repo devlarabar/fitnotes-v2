@@ -34,7 +34,7 @@ export function Sidebar({ activeTab, setActiveTab }: Props) {
           F
         </div>
         <span className={`text-2xl font-black bg-clip-text text-transparent 
-        bg-linear-to-r from-white to-text-dim tracking-tight hover:cursor-pointer`}
+        bg-linear-to-r from-text-primary to-text-dim tracking-tight hover:cursor-pointer`}
           onClick={() => setActiveTab('workout')}
         >
           FitNotes
