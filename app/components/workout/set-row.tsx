@@ -4,7 +4,7 @@ import { Workout } from '@/app/lib/schema';
 import { Button, SetNumberBadge, SpinnerInline } from '../ui';
 import { Textarea } from '../ui/form/textarea';
 import { SetInputs } from '../set-inputs';
-import { useWorkout } from '@/app/hooks/use-workout';
+import { useWorkoutData } from '@/app/contexts/workout-data-context';
 import { supabase } from '@/app/lib/supabase';
 import { toast } from 'sonner';
 
@@ -16,13 +16,26 @@ interface Props {
 }
 
 export function SetRow({ set, index, measurementType, onUpdate }: Props) {
-  const { weightUnits, distanceUnits } = useWorkout();
+  const { weightUnits, distanceUnits, updateWorkout, deleteWorkout, addWorkout } = useWorkoutData();
   const [isEditing, setIsEditing] = useState(false);
   const [editedSet, setEditedSet] = useState(set);
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
     setSaving(true);
+    
+    // Optimistically update cache
+    const backup = { ...set };
+    updateWorkout(editedSet.id, {
+      weight: editedSet.weight,
+      weight_unit: editedSet.weight_unit,
+      reps: editedSet.reps,
+      distance: editedSet.distance,
+      distance_unit: editedSet.distance_unit,
+      time: editedSet.time,
+      comment: editedSet.comment
+    });
+
     try {
       const { error } = await supabase
         .from('workouts')
@@ -43,6 +56,8 @@ export function SetRow({ set, index, measurementType, onUpdate }: Props) {
       setIsEditing(false);
       onUpdate();
     } catch (err) {
+      // Rollback on error
+      updateWorkout(backup.id, backup);
       console.error('Error saving set:', err);
       toast.error('Failed to save');
     } finally {
@@ -52,6 +67,10 @@ export function SetRow({ set, index, measurementType, onUpdate }: Props) {
 
   const handleDelete = async () => {
     if (!confirm('Delete this set?')) return;
+
+    // Optimistically delete from cache
+    const backup = { ...set };
+    deleteWorkout(set.id);
 
     try {
       const { error } = await supabase
@@ -64,6 +83,8 @@ export function SetRow({ set, index, measurementType, onUpdate }: Props) {
       toast.success('Set deleted');
       onUpdate();
     } catch (err) {
+      // Rollback on error
+      addWorkout(backup);
       console.error('Error deleting set:', err);
       toast.error('Failed to delete');
     }

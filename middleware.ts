@@ -58,10 +58,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth', request.url));
   }
 
-  // Redirect to home if logged in and on auth page
+  // Redirect to workout if logged in and on auth page
   if (hasSession && isAuthPage) {
-    console.log('Session found, redirecting to /');
-    return NextResponse.redirect(new URL('/', request.url));
+    console.log('Session found, redirecting to /workout');
+    return NextResponse.redirect(new URL('/workout', request.url));
   }
 
   return response;

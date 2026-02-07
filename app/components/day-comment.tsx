@@ -6,6 +6,7 @@ import { supabase } from '@/app/lib/supabase';
 import { toast } from 'sonner';
 import { DayComment as DayCommentType } from '@/app/lib/schema';
 import { useUser } from '@/app/contexts/user-context';
+import { useWorkoutData } from '@/app/contexts/workout-data-context';
 
 interface Props {
   date: string; // YYYY-MM-DD format
@@ -15,6 +16,7 @@ interface Props {
 
 export function DayComment({ date, initialComment, onUpdate }: Props) {
   const { user } = useUser();
+  const { addComment, updateComment, deleteComment } = useWorkoutData();
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState('');
   const [saving, setSaving] = useState(false);
@@ -35,41 +37,75 @@ export function DayComment({ date, initialComment, onUpdate }: Props) {
     }
 
     setSaving(true);
-    try {
-      if (initialComment) {
-        // Update existing
+    
+    if (initialComment) {
+      // Update existing - optimistic update
+      const oldComment = editValue;
+      updateComment(initialComment.id, editValue);
+      
+      try {
         const { error } = await supabase
           .from('comments')
           .update({ comment: editValue })
           .eq('id', initialComment.id);
 
         if (error) throw error;
-      } else {
-        // Create new
-        if (!user?.id) {
-          throw new Error('User not authenticated');
-        }
-
-        const { error } = await supabase
-          .from('comments')
-          .insert({ date, comment: editValue, user_id: user.id });
-
-        if (error) throw error;
+        
+        toast.success('Comment saved');
+        onUpdate();
+        setIsEditing(false);
+      } catch (err) {
+        // Rollback on error
+        updateComment(initialComment.id, initialComment.comment);
+        console.error('Error saving comment:', err);
+        toast.error('Failed to save comment');
+      } finally {
+        setSaving(false);
+      }
+    } else {
+      // Create new - optimistic add
+      if (!user?.id) {
+        toast.error('User not authenticated');
+        setSaving(false);
+        return;
       }
 
-      toast.success('Comment saved');
-      onUpdate();
-      setIsEditing(false);
-    } catch (err) {
-      console.error('Error saving comment:', err);
-      toast.error('Failed to save comment');
-    } finally {
-      setSaving(false);
+      const tempId = -Date.now();
+      addComment({ id: tempId, date, comment: editValue });
+
+      try {
+        const { data, error } = await supabase
+          .from('comments')
+          .insert({ date, comment: editValue, user_id: user.id })
+          .select('id')
+          .single();
+
+        if (error) throw error;
+
+        // Replace temp with real ID
+        deleteComment(tempId);
+        addComment({ id: data.id, date, comment: editValue });
+        
+        toast.success('Comment saved');
+        onUpdate();
+        setIsEditing(false);
+      } catch (err) {
+        // Rollback on error
+        deleteComment(tempId);
+        console.error('Error saving comment:', err);
+        toast.error('Failed to save comment');
+      } finally {
+        setSaving(false);
+      }
     }
   };
 
   const handleDelete = async () => {
     if (!initialComment) return;
+
+    // Optimistically delete from cache
+    const backup = initialComment;
+    deleteComment(initialComment.id);
 
     try {
       const { error } = await supabase
@@ -84,6 +120,8 @@ export function DayComment({ date, initialComment, onUpdate }: Props) {
       setIsEditing(false);
       onUpdate();
     } catch (err) {
+      // Rollback on error
+      addComment(backup);
       console.error('Error deleting comment:', err);
       toast.error('Failed to delete comment');
     }

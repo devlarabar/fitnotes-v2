@@ -11,22 +11,19 @@ interface Props {
 }
 
 export function CategorySelector({ categories, onSelect, onClose }: Props) {
+  const sortedCategories = [...categories].sort((a, b) => a.name.localeCompare(b.name));
+
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-100 bg-bg-primary flex flex-col"
-    >
-      <div className="p-4 border-b border-border-secondary flex items-center gap-4">
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
         <Button variant="ghost" onClick={onClose} className="p-2">
           <X size={24} />
         </Button>
         <h2 className="text-xl font-black text-text-primary">Select Category</h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {categories.map(category => (
+      <div className="space-y-3">
+        {sortedCategories.map(category => (
           <Card
             key={category.id}
             onClick={() => onSelect(category)}
@@ -46,6 +43,6 @@ export function CategorySelector({ categories, onSelect, onClose }: Props) {
           </Card>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }

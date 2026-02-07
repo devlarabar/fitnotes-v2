@@ -1,5 +1,39 @@
 # Changelog
 
+## 2024-02-07 - App Router Migration & Performance Optimization
+
+### 🚀 Next.js App Router Migration
+- Migrated from client-side state routing to Next.js App Router
+- Created `(main)` route group for authenticated pages
+- Split workout flow into separate routes:
+  - `/workout` - Main workout tracking page
+  - `/workout/category` - Category selection
+  - `/workout/exercise` - Exercise selection with category filter
+  - `/history` - Calendar view
+  - `/progress` - Progress charts
+  - `/settings` - Settings page
+- Removed fixed overlay modals in favor of proper page navigation
+- Updated middleware to redirect to `/workout` instead of `/`
+- Added Suspense boundaries for useSearchParams
+- Eliminated jarring flash when navigating between pages
+
+### ⚡ Performance Optimization
+- Created `WorkoutDataContext` to cache all workout data globally
+- Eliminated redundant database queries across page navigation
+- Data fetched once at app level and shared across all pages
+- Removed loading spinners when navigating between pages
+- Implemented optimistic updates with automatic rollback:
+  - Add workout: instantly shows in UI, rolls back on failure
+  - Update workout/comment: instantly updates, reverts on failure
+  - Delete workout/comment: instantly removes, restores on failure
+- UI feels instant while maintaining data consistency with database
+
+### 🎨 UI/UX Improvements
+- Updated category and exercise selectors to be regular page content
+- Restored original empty state design with dashed border card
+- Fixed empty state button variant to use secondary style
+- Improved page transition smoothness
+
 ## 2024-02-07 - Multi-user Support & Theme System
 
 ### 🎨 Theme System
