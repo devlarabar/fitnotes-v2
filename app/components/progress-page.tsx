@@ -57,7 +57,7 @@ export function ProgressPage() {
               value={selectedCategory || ''}
               onChange={(e) => handleCategoryChange(Number(e.target.value))}
               className="w-full bg-bg-tertiary border border-border-primary 
-                rounded-xl px-4 py-3 text-white focus:border-violet-500 
+                rounded-xl px-4 py-3 text-text-primary focus:border-accent-primary 
                 outline-none transition-all"
             >
               <option value="">Select a category</option>
@@ -80,7 +80,7 @@ export function ProgressPage() {
               onChange={(e) => handleExerciseChange(Number(e.target.value))}
               disabled={!selectedCategory}
               className="w-full bg-bg-tertiary border border-border-primary 
-                rounded-xl px-4 py-3 text-white focus:border-violet-500 
+                rounded-xl px-4 py-3 text-text-primary focus:border-accent-primary 
                 outline-none transition-all disabled:opacity-50 
                 disabled:cursor-not-allowed"
             >

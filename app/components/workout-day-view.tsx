@@ -32,7 +32,7 @@ export function WorkoutDayView({
   return (
     <Card className="p-6">
       {showTitle && (
-        <h3 className="text-xl font-black text-white mb-4">
+        <h3 className="text-xl font-black text-text-primary mb-4">
           {new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
             weekday: 'long',
             month: 'long',

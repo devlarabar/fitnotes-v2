@@ -18,7 +18,7 @@ export function DayNavigation({ date, isToday, onPrevious, onNext, onToday }: Pr
       </Button>
 
       <div className="text-center">
-        <h2 className="text-2xl font-black text-white">
+        <h2 className="text-2xl font-black text-text-primary">
           {date.toLocaleDateString('en-US', {
             weekday: 'long',
             month: 'short',

@@ -99,7 +99,7 @@ export default function Calendar({ onDateSelect }: Props) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-12 h-12 border-4 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-12 h-12 border-4 border-accent-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -119,13 +119,13 @@ export default function Calendar({ onDateSelect }: Props) {
           </Button>
 
           <div className="text-center flex flex-col justify-center items-center">
-            <h2 className="text-2xl font-black text-white">
+            <h2 className="text-2xl font-black text-text-primary">
               {MONTHS[month]} {year}
             </h2>
             <Button
               variant="ghost"
               onClick={goToToday}
-              className="text-xs text-slate-500 hover:text-violet-400 mt-1 mx-auto"
+              className="text-xs text-text-primary0 hover:text-accent-secondary mt-1 mx-auto"
             >
               Today
             </Button>
@@ -139,7 +139,7 @@ export default function Calendar({ onDateSelect }: Props) {
         {/* Day Headers */}
         <div className="grid grid-cols-7 gap-2 mb-2">
           {DAYS.map(day => (
-            <div key={day} className="text-center text-xs font-black text-slate-600 uppercase tracking-wider py-2">
+            <div key={day} className="text-center text-xs font-black text-text-subtle uppercase tracking-wider py-2">
               {day}
             </div>
           ))}
@@ -158,9 +158,9 @@ export default function Calendar({ onDateSelect }: Props) {
                 className={`
                   aspect-square rounded-xl p-2 text-sm font-bold transition-all relative
                   hover:cursor-pointer
-                  ${!item.isCurrentMonth ? 'text-slate-700 cursor-default' : 'text-slate-300 hover:bg-slate-800'}
-                  ${todayDate && item.isCurrentMonth ? 'ring-2 ring-violet-500' : ''}
-                  ${workout && item.isCurrentMonth ? 'bg-violet-500/20 text-violet-400' : ''}
+                  ${!item.isCurrentMonth ? 'text-text-faint cursor-default' : 'text-text-secondary hover:bg-bg-tertiary'}
+                  ${todayDate && item.isCurrentMonth ? 'ring-2 ring-accent-primary' : ''}
+                  ${workout && item.isCurrentMonth ? 'bg-accent-primary/20 text-accent-secondary' : ''}
                 `}
                 whileTap={item.isCurrentMonth ? { scale: 0.95 } : {}}
               >

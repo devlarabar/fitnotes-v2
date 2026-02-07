@@ -54,7 +54,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-primary text-slate-200">
+    <div className="min-h-screen bg-bg-primary text-text-secondary">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <div className="md:pl-64 flex flex-col min-h-screen">

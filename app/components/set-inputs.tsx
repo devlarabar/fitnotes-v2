@@ -39,7 +39,7 @@ export function SetInputs({ set, measurementType, weightUnits, distanceUnits, on
           <select
             value={set.distance_unit || distanceUnits[0]?.id}
             onChange={e => onUpdate({ distance_unit: parseInt(e.target.value) })}
-            className="bg-slate-950 border border-slate-800 rounded-xl px-2 text-white focus:border-violet-500 outline-none transition-all text-sm font-bold mt-5"
+            className="bg-bg-primary border border-border-primary rounded-xl px-2 text-text-primary focus:border-accent-primary outline-none transition-all text-sm font-bold mt-5"
           >
             {distanceUnits.map(unit => (
               <option key={unit.id} value={unit.id}>{unit.name}</option>
@@ -85,7 +85,7 @@ export function SetInputs({ set, measurementType, weightUnits, distanceUnits, on
         <select
           value={set.weight_unit || weightUnits[0]?.id}
           onChange={e => onUpdate({ weight_unit: parseInt(e.target.value) })}
-          className="bg-slate-950 border border-slate-800 rounded-xl px-2 text-white focus:border-violet-500 outline-none transition-all text-sm font-bold mt-5"
+          className="bg-bg-primary border border-border-primary rounded-xl px-2 text-text-primary focus:border-accent-primary outline-none transition-all text-sm font-bold mt-5"
         >
           {weightUnits.map(unit => (
             <option key={unit.id} value={unit.id}>{unit.name}</option>

@@ -50,11 +50,11 @@ export default function AuthPage() {
         <div className="text-center">
           <div className="w-20 h-20 rounded-3xl bg-linear-to-br 
             from-violet-600 to-pink-600 flex items-center justify-center 
-            mx-auto mb-4 shadow-xl shadow-violet-900/30"
+            mx-auto mb-4 shadow-xl shadow-accent-primary/30"
           >
-            <Dumbbell size={32} className="text-white" />
+            <Dumbbell size={32} className="text-text-primary" />
           </div>
-          <h1 className="text-4xl font-black text-white mb-2">FitNotes</h1>
+          <h1 className="text-4xl font-black text-text-primary mb-2">FitNotes</h1>
           <p className="text-text-muted">Track your fitness journey</p>
         </div>
 

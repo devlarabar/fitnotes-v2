@@ -24,7 +24,7 @@ export function TodaySetsList({ sets, editingSetId, onEdit, onDelete }: Props) {
             key={set.id}
             className={`group rounded-xl cursor-pointer transition-colors ${
               editingSetId === set.id
-                ? 'bg-violet-500/20 border border-violet-500/50'
+                ? 'bg-accent-primary/20 border border-accent-primary/50'
                 : 'bg-bg-tertiary/30 hover:bg-bg-tertiary/50'
             }`}
             onClick={() => onEdit(set)}
@@ -58,7 +58,7 @@ export function TodaySetsList({ sets, editingSetId, onEdit, onDelete }: Props) {
                   e.stopPropagation();
                   onDelete(set.id);
                 }}
-                className="p-2 h-auto text-slate-700 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="p-2 h-auto text-text-faint hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <Trash2 size={16} />
               </Button>
@@ -66,7 +66,7 @@ export function TodaySetsList({ sets, editingSetId, onEdit, onDelete }: Props) {
             {set.comment && (
               <div className="px-3 pb-3 pt-0">
                 <div className="flex items-start gap-1.5">
-                  <MessageSquare size={12} className="text-slate-600 shrink-0 mt-0.5" />
+                  <MessageSquare size={12} className="text-text-subtle shrink-0 mt-0.5" />
                   <p className="text-xs text-text-muted italic">{set.comment}</p>
                 </div>
               </div>

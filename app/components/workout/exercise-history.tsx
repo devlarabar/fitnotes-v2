@@ -147,7 +147,7 @@ export function ExerciseHistory({ exerciseId }: Props) {
                 {set.comment && (
                   <div className="px-3 pb-3 pt-0">
                     <div className="flex items-start gap-1.5">
-                      <MessageSquare size={12} className="text-slate-600 shrink-0 mt-0.5" />
+                      <MessageSquare size={12} className="text-text-subtle shrink-0 mt-0.5" />
                       <p className="text-xs text-text-muted italic">{set.comment}</p>
                     </div>
                   </div>
