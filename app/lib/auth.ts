@@ -15,6 +15,12 @@ export async function signIn(email: string, password: string) {
     password
   });
 
+  console.log('Sign in result:', { 
+    hasSession: !!data.session, 
+    hasUser: !!data.user,
+    error 
+  });
+
   return { data, error };
 }
 
