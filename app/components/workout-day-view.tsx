@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dumbbell, Trash2, Save, X, Trophy } from 'lucide-react';
+import { Dumbbell, Trash2, Save, X, Trophy, ChevronRight } from 'lucide-react';
 import { Workout, Exercise, WeightUnit, DistanceUnit } from '@/app/lib/schema';
 import { Button, Card } from './ui';
 import { SetInputs } from './set-inputs';
@@ -23,6 +23,7 @@ interface Props {
   distanceUnits: DistanceUnit[];
   onUpdate?: () => void;
   showTitle?: boolean;
+  onExerciseClick?: (exerciseId: number) => void;
 }
 
 export function WorkoutDayView({
@@ -32,7 +33,8 @@ export function WorkoutDayView({
   weightUnits,
   distanceUnits,
   onUpdate,
-  showTitle = true
+  showTitle = true,
+  onExerciseClick
 }: Props) {
   const [editingSetId, setEditingSetId] = useState<number | null>(null);
   const [editedSet, setEditedSet] = useState<Workout | null>(null);
@@ -125,14 +127,20 @@ export function WorkoutDayView({
 
           return (
             <div key={group.exercise.id} className="bg-slate-800/30 rounded-2xl p-4 border border-slate-800">
-              <div className="flex items-center gap-3 mb-3">
+              <div 
+                className={`flex items-center gap-3 mb-3 ${onExerciseClick ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
+                onClick={() => onExerciseClick?.(group.exercise.id)}
+              >
                 <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center text-violet-400">
                   <Dumbbell size={18} />
                 </div>
-                <div>
+                <div className="flex-1">
                   <h4 className="font-bold text-white">{group.exercise.name}</h4>
                   <p className="text-xs text-slate-500 uppercase tracking-wider">{group.exercise.category}</p>
                 </div>
+                {onExerciseClick && (
+                  <ChevronRight size={20} className="text-slate-600" />
+                )}
               </div>
 
               <div className="space-y-2">

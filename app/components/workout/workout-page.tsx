@@ -78,6 +78,13 @@ export function WorkoutPage() {
     setIsCategorySelectorOpen(true);
   };
 
+  const handleExerciseClick = (exerciseId: number) => {
+    const exercise = exercises.find(e => e.id === exerciseId);
+    if (exercise) {
+      setTrackingExercise(exercise);
+    }
+  };
+
   const isToday = viewDate.toDateString() === new Date().toDateString();
   const viewDateStr = formatDate(viewDate);
   const hasWorkoutsForDay = getGroupedWorkouts(viewDateStr).length > 0;
@@ -126,6 +133,7 @@ export function WorkoutPage() {
         onUpdate={refetchHistory}
         onOpenSelector={handleOpenSelector}
         showEmptyState={!hasWorkoutsForDay}
+        onExerciseClick={handleExerciseClick}
       />
 
       {/* Add exercise button - always show if there are workouts */}
