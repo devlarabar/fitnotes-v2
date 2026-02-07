@@ -1,7 +1,10 @@
+'use client';
+
 import React from 'react';
-import { Dumbbell, Calendar, TrendingUp, Settings } from 'lucide-react';
+import { Dumbbell, Calendar, TrendingUp, Settings, Sun, Moon } from 'lucide-react';
 import { cn } from '@/app/lib/utils';
 import { TabType } from '../lib/tabs';
+import { useTheme } from '@/app/contexts/theme-context';
 
 interface Props {
   activeTab: TabType;
@@ -16,6 +19,8 @@ const NAV_ITEMS = [
 ];
 
 export function Sidebar({ activeTab, setActiveTab }: Props) {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <nav
       className={`hidden md:flex flex-col w-64 fixed left-0 top-0 bottom-0 
@@ -36,7 +41,7 @@ export function Sidebar({ activeTab, setActiveTab }: Props) {
         </span>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 flex-1">
         {NAV_ITEMS.map((item) => (
           <button
             key={item.id}
@@ -57,6 +62,15 @@ export function Sidebar({ activeTab, setActiveTab }: Props) {
           </button>
         ))}
       </div>
+
+      {/* Theme Toggle */}
+      <button
+        onClick={toggleTheme}
+        className="flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 font-bold hover:cursor-pointer text-text-dim hover:text-text-secondary hover:bg-bg-secondary mt-4"
+      >
+        {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+        {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+      </button>
     </nav>
   );
 }

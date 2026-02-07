@@ -81,6 +81,7 @@
 }
 
 @theme {
+  /* Default (Dark Mode) - DO NOT CHANGE THESE */
   --color-bg-primary: #020617;
   --color-bg-secondary: #0f172a;
   --color-bg-tertiary: #1e293b;
@@ -92,6 +93,26 @@
   --color-text-dim: #64748b;
   --color-text-subtle: #475569;
   --color-text-faint: #334155;
+  --color-accent-primary: #8b5cf6;
+  --color-accent-secondary: #a78bfa;
+  --color-accent-pink: #ec4899;
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+}
+
+/* Light Mode Override */
+:root:not(.dark) {
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f9fafb;
+  --color-bg-tertiary: #f3f4f6;
+  --color-border-primary: #e5e7eb;
+  --color-border-secondary: #f3f4f6;
+  --color-text-primary: #111827;
+  --color-text-secondary: #374151;
+  --color-text-muted: #6b7280;
+  --color-text-dim: #9ca3af;
+  --color-text-subtle: #d1d5db;
+  --color-text-faint: #e5e7eb;
   --color-accent-primary: #8b5cf6;
   --color-accent-secondary: #a78bfa;
   --color-accent-pink: #ec4899;
@@ -163,22 +184,22 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: #0f172a;
+    background: var(--color-bg-secondary);
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: var(--color-text-faint);
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+    background: var(--color-text-subtle);
   }
 
   /* Firefox scrollbar */
   * {
     scrollbar-width: thin;
-    scrollbar-color: #334155 #0f172a;
+    scrollbar-color: var(--color-text-faint) var(--color-bg-secondary);
   }
 }

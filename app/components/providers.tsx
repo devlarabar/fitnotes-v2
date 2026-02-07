@@ -2,10 +2,11 @@
 
 import React from 'react';
 import { Toaster } from 'sonner';
+import { ThemeProvider } from '@/app/contexts/theme-context';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <ThemeProvider>
       <Toaster 
         position="top-center" 
         theme="dark" 
@@ -21,6 +22,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
         }}
       />
       {children}
-    </>
+    </ThemeProvider>
   );
 }
