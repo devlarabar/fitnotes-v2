@@ -233,7 +233,7 @@ export function WorkoutDayView({
                               </div>
                               {set.comment && (
                                 <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                                  <MessageSquare size={12} className="text-slate-600 flex-shrink-0" />
+                                  <MessageSquare size={12} className="text-slate-600 shrink-0" />
                                   <span className="text-xs text-slate-500 truncate">
                                     {set.comment}
                                   </span>
@@ -241,7 +241,7 @@ export function WorkoutDayView({
                               )}
                             </div>
                             {set.is_pr && (
-                              <Trophy size={16} className="text-yellow-500 flex-shrink-0" />
+                              <Trophy size={16} className="text-yellow-500 shrink-0" />
                             )}
                             <Button
                               variant="ghost"

@@ -102,3 +102,8 @@ export const SectionHeader = ({ title, subtitle, action }: { title: string; subt
 
 // Re-export cn utility for convenience
 export { cn } from '@/app/lib/utils';
+
+// Re-export new components
+export { Spinner, SpinnerInline } from './spinner';
+export { SetNumberBadge } from './set-number-badge';
+export { IconContainer } from './icon-container';

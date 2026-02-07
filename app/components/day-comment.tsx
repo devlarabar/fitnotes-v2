@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, Save, X } from 'lucide-react';
-import { Button, Card } from './ui';
+import { Button, Card, SpinnerInline } from './ui';
 import { Textarea } from './ui/form/textarea';
 import { supabase } from '@/app/lib/supabase';
 import { toast } from 'sonner';
@@ -157,7 +157,7 @@ export function DayComment({ date }: Props) {
             >
               {saving ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <SpinnerInline />
                   Saving...
                 </>
               ) : (

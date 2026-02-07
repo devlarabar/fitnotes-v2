@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
 import { supabase } from '@/app/lib/supabase';
 import { Workout } from '@/app/lib/schema';
-import { Button } from '@/app/components/ui';
+import { Button, Spinner, SetNumberBadge } from '@/app/components/ui';
 
 interface Props {
   exerciseId: number;
@@ -75,7 +75,7 @@ export function ExerciseHistory({ exerciseId }: Props) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-10">
-        <div className="w-8 h-8 border-4 border-accent-primary border-t-transparent rounded-full animate-spin"></div>
+        <Spinner />
       </div>
     );
   }
@@ -126,9 +126,7 @@ export function ExerciseHistory({ exerciseId }: Props) {
             className="flex items-center justify-between p-3 bg-bg-tertiary/30 rounded-xl text-sm"
           >
             <div className="flex items-center gap-3">
-              <div className="w-6 h-6 rounded-lg bg-bg-tertiary flex items-center justify-center text-xs font-bold text-text-dim">
-                {startIdx + idx + 1}
-              </div>
+              <SetNumberBadge number={startIdx + idx + 1} />
               <span className="text-text-dim text-xs">
                 {new Date(set.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>

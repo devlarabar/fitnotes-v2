@@ -6,12 +6,13 @@ import { SettingsPage } from '@/app/components/settings-page';
 import { AnimatePresence, motion } from 'motion/react';
 import { WorkoutPage } from './components/workout/workout-page';
 import { MobileNav, Sidebar } from './components/navigation';
+import { Spinner } from './components/ui';
 
 const Calendar = dynamic(() => import('@/app/components/calendar'), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center py-20">
-      <div className="w-12 h-12 border-4 border-accent-primary border-t-transparent rounded-full animate-spin"></div>
+      <Spinner size="lg" />
     </div>
   )
 });

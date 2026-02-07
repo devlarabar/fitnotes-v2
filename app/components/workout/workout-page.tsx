@@ -12,7 +12,7 @@ import { DayWorkouts } from './day-workouts';
 import { ExerciseTracker } from './exercise-tracker';
 import { DayComment } from '@/app/components/day-comment';
 import { Plus } from 'lucide-react';
-import { Button } from '@/app/components/ui';
+import { Button, Spinner } from '@/app/components/ui';
 
 export function WorkoutPage() {
   const [isCategorySelectorOpen, setIsCategorySelectorOpen] = useState(false);
@@ -110,7 +110,7 @@ export function WorkoutPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-12 h-12 border-4 border-accent-primary border-t-transparent rounded-full animate-spin"></div>
+        <Spinner size="lg" />
       </div>
     );
   }

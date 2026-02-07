@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Plus, Trash2, Save, Trophy, X } from 'lucide-react';
 import { Exercise, WeightUnit, DistanceUnit, Workout } from '@/app/lib/schema';
-import { Button, Card, Badge } from '@/app/components/ui';
+import { Button, Card, Badge, SpinnerInline, SetNumberBadge } from '@/app/components/ui';
 import { Textarea } from '@/app/components/ui/form/textarea';
 import { SetInputs } from '@/app/components/set-inputs';
 import { ExerciseHistory } from './exercise-history';
@@ -333,12 +333,12 @@ export function ExerciseTracker({
                   disabled={saving}
                   className={editingSetId ? 'flex-1' : 'w-full'}
                 >
-                  {saving ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Saving...
-                    </>
-                  ) : (
+                {saving ? (
+                  <>
+                    <SpinnerInline />
+                    Saving...
+                  </>
+                ) : (
                     <>
                       <Save size={18} />
                       {editingSetId ? 'Update Set' : 'Save Set'}
@@ -364,10 +364,8 @@ export function ExerciseTracker({
                         }`}
                         onClick={() => handleEditSet(set)}
                       >
-                        <div className="flex items-center gap-3 p-3">
-                          <div className="w-6 h-6 rounded-lg bg-bg-tertiary flex items-center justify-center text-xs font-bold text-text-dim">
-                            {idx + 1}
-                          </div>
+                        <div className="flex items-center gap-3 p-3"                        >
+                          <SetNumberBadge number={idx + 1} />
                           <div className="flex-1 flex gap-3 text-sm">
                             {set.weight !== null && set.weight !== undefined && (
                               <span className="font-bold text-accent-secondary">
