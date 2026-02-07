@@ -49,7 +49,8 @@ export const Button = ({
   return (
     <button 
       className={cn(
-        "font-bold transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none",
+        `font-bold transition-all duration-300 active:scale-95 flex items-center 
+        justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none hover:cursor-pointer`,
         variants[variant],
         sizes[size],
         className
