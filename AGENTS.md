@@ -121,53 +121,7 @@ User Action → Optimistic UI Update → Supabase Query → Success/Rollback
 
 ## Database Schema
 
-### Core Tables
-
-**categories**
-- `id` (primary key)
-- `name` (text) - e.g., "Chest", "Back", "Legs"
-
-**measurement_types**
-- `id` (primary key)
-- `name` (text) - "reps", "distance", or "time"
-
-**exercises**
-- `id` (primary key)
-- `name` (text)
-- `category` (foreign key → categories)
-- `measurement_type` (foreign key → measurement_types)
-
-**workouts** (individual sets, not sessions)
-- `id` (primary key)
-- `user_id` (foreign key → users)
-- `date` (text, format: YYYY-MM-DD)
-- `exercise` (foreign key → exercises)
-- `category` (foreign key → categories)
-- `weight` (numeric, nullable)
-- `weight_unit` (foreign key → weight_units, nullable)
-- `reps` (integer, nullable)
-- `distance` (numeric, nullable)
-- `distance_unit` (foreign key → distance_units, nullable)
-- `time` (text, format: MM:SS, nullable)
-- `comment` (text, nullable)
-- `is_pr` (boolean) - true if this set is a personal record
-
-**users**
-- `id` (primary key)
-- `auth_user_id` (foreign key → auth.users)
-- `first_name` (text, nullable)
-- `last_name` (text, nullable)
-- `role` (text) - "dev", "user", or "demo"
-
-**comments** (day-level notes)
-- `id` (primary key)
-- `user_id` (foreign key → users)
-- `date` (text, format: YYYY-MM-DD)
-- `comment` (text)
-- Unique constraint: (user_id, date)
-
-**settings**
-- `signups_enabled` (boolean)
+See `app/lib/schema.ts` for TypeScript types representing the database schema.
 
 ### Important Notes
 - **Workouts are sets, not sessions** - Each row is one set
@@ -211,6 +165,8 @@ User Action → Optimistic UI Update → Supabase Query → Success/Rollback
 - **Use design system colors** - `bg-bg-primary`, `text-text-muted`
 - **Responsive by default** - Mobile-first approach
 - **Consistent spacing** - Use Tailwind spacing scale
+- **Use existing components** - Prefer reusing over creating new
+- **Do not repeat styles** - Extract to reusable components
 
 ### Performance
 - **Memoize expensive calculations** - Use `useMemo`
@@ -226,6 +182,19 @@ User Action → Optimistic UI Update → Supabase Query → Success/Rollback
 
 ### Code Quality
 - **Line length** - Prefer <80 characters, max 100
+   - Example of what **not to do**:
+    ```tsx
+    <div className="bg-bg-primary text-text-muted p-4 flex flex-wrap justify-center items-center border"><p>Hello</p></div>
+    ```
+  - Do instead:
+    ```tsx
+    <div className={`
+    bg-bg-primary text-text-muted p-4 flex flex-wrap justify-center 
+    items-center border
+    `}>
+      <p>Hello</p>
+    </div>
+    ```
 - **Function length** - Prefer <30 lines
 - **File length** - Prefer <250 lines
 - **No magic numbers** - Use named constants
