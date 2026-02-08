@@ -17,7 +17,6 @@ function ExercisePageContent() {
   useEffect(() => {
     // Only redirect if data is loaded and category still not found
     if (!loading && !categoryId) {
-      console.log('No categoryId in URL, redirecting');
       router.push('/workout/category');
     }
   }, [categoryId, loading, router]);

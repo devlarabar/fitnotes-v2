@@ -2,6 +2,7 @@ export const tabs = [
   'workout',
   'history',
   'progress',
-  'settings'
+  'settings',
+  'dev'
 ]
 export type TabType = typeof tabs[number];

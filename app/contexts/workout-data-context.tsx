@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/app/lib/supabase';
-import { Exercise, WeightUnit, DistanceUnit, Category, Workout, DayComment } from '@/app/lib/schema';
+import { Exercise, WeightUnit, DistanceUnit, Category, MeasurementType, Workout, DayComment } from '@/app/lib/schema';
 import { useUser } from './user-context';
 
 interface WorkoutDataContextType {
@@ -10,6 +10,7 @@ interface WorkoutDataContextType {
   categories: Category[];
   weightUnits: WeightUnit[];
   distanceUnits: DistanceUnit[];
+  measurementTypes: MeasurementType[];
   workouts: Workout[];
   dayComments: Map<string, DayComment>;
   loading: boolean;
@@ -30,6 +31,7 @@ export function WorkoutDataProvider({ children }: { children: React.ReactNode })
   const [categories, setCategories] = useState<Category[]>([]);
   const [weightUnits, setWeightUnits] = useState<WeightUnit[]>([]);
   const [distanceUnits, setDistanceUnits] = useState<DistanceUnit[]>([]);
+  const [measurementTypes, setMeasurementTypes] = useState<MeasurementType[]>([]);
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [dayComments, setDayComments] = useState<Map<string, DayComment>>(new Map());
   const [loading, setLoading] = useState(true);
@@ -51,17 +53,19 @@ export function WorkoutDataProvider({ children }: { children: React.ReactNode })
       }
 
       // Fetch reference data (not user-specific)
-      const [exercisesRes, categoriesRes, weightUnitsRes, distanceUnitsRes] = await Promise.all([
+      const [exercisesRes, categoriesRes, weightUnitsRes, distanceUnitsRes, measurementTypesRes] = await Promise.all([
         supabase.from('exercises').select('id, name, category, measurement_type(name), categories(name)'),
         supabase.from('categories').select('*'),
         supabase.from('weight_units').select('*'),
-        supabase.from('distance_units').select('*')
+        supabase.from('distance_units').select('*'),
+        supabase.from('measurement_types').select('*')
       ]);
 
       if (exercisesRes.data) setExercises(exercisesRes.data as any);
       if (categoriesRes.data) setCategories(categoriesRes.data);
       if (weightUnitsRes.data) setWeightUnits(weightUnitsRes.data);
       if (distanceUnitsRes.data) setDistanceUnits(distanceUnitsRes.data);
+      if (measurementTypesRes.data) setMeasurementTypes(measurementTypesRes.data);
 
       // Fetch user-specific data if user is logged in
       if (user?.id) {
@@ -176,6 +180,7 @@ export function WorkoutDataProvider({ children }: { children: React.ReactNode })
         categories,
         weightUnits,
         distanceUnits,
+        measurementTypes,
         workouts,
         dayComments,
         loading,
