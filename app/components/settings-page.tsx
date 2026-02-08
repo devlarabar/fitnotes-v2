@@ -5,10 +5,12 @@ import { signOut } from '@/app/lib/auth';
 import { toast } from 'sonner';
 import { LogOut } from 'lucide-react';
 import { useAuth } from '@/app/hooks/use-auth';
+import { useUser } from '@/app/contexts/user-context';
 
 export function SettingsPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user: authUser } = useAuth();
+  const { user: dbUser } = useUser();
 
   const handleSignOut = async () => {
     const { error } = await signOut();
@@ -58,8 +60,28 @@ export function SettingsPage() {
           <p className="text-xs text-text-dim uppercase tracking-wider mb-1">
             Account
           </p>
-          <p className="text-text-secondary">{user?.email}</p>
+          <p className="text-text-secondary">{authUser?.email}</p>
         </div>
+
+        {dbUser && (
+          <div>
+            <p className="text-xs text-text-dim uppercase tracking-wider mb-1">
+              Role
+            </p>
+            <p className="text-text-secondary font-mono">{dbUser.role}</p>
+          </div>
+        )}
+
+        {dbUser?.first_name && (
+          <div>
+            <p className="text-xs text-text-dim uppercase tracking-wider mb-1">
+              Name
+            </p>
+            <p className="text-text-secondary">
+              {dbUser.first_name} {dbUser.last_name}
+            </p>
+          </div>
+        )}
 
         <Button 
           variant="danger" 
