@@ -17,6 +17,7 @@ export default function MainLayout({
     if (pathname.startsWith('/history')) return 'history';
     if (pathname.startsWith('/progress')) return 'progress';
     if (pathname.startsWith('/settings')) return 'settings';
+    if (pathname.startsWith('/dev')) return 'dev';
     return 'workout';
   };
 
@@ -26,6 +27,7 @@ export default function MainLayout({
       history: '/history',
       progress: '/progress',
       settings: '/settings',
+      dev: '/dev',
     };
     router.push(routes[tab]);
   };
