@@ -10,7 +10,6 @@ export default function CategoryPage() {
   const { categories } = useWorkoutData();
 
   const handleSelect = (category: any) => {
-    console.log('Category selected:', category);
     router.push(`/workout/exercise?categoryId=${category.id}`);
   };
 
