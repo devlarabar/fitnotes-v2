@@ -41,6 +41,7 @@ export async function middleware(request: NextRequest) {
 
   const { data: { session } } = await supabase.auth.getSession();
   const isAuthPage = request.nextUrl.pathname.startsWith('/auth');
+  const isDevPage = request.nextUrl.pathname.startsWith('/dev');
 
   // Fallback: Check for manual cookies if session is null
   const hasManualCookies = request.cookies.has('sb-access-token');
@@ -62,6 +63,29 @@ export async function middleware(request: NextRequest) {
   if (hasSession && isAuthPage) {
     console.log('Session found, redirecting to /workout');
     return NextResponse.redirect(new URL('/workout', request.url));
+  }
+
+  // Check dev role for /dev page
+  if (isDevPage && hasSession) {
+    try {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      
+      if (authUser) {
+        const { data: userData } = await supabase
+          .from('users')
+          .select('role')
+          .eq('auth_user_id', authUser.id)
+          .single();
+
+        if (userData?.role !== 'dev') {
+          console.log('Non-dev user trying to access /dev, redirecting to /workout');
+          return NextResponse.redirect(new URL('/workout', request.url));
+        }
+      }
+    } catch (err) {
+      console.error('Error checking user role:', err);
+      return NextResponse.redirect(new URL('/workout', request.url));
+    }
   }
 
   return response;
