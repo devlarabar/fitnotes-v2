@@ -1,5 +1,27 @@
 # Changelog
 
+## 2024-02-08 - Analytics Feature
+
+### 📊 Analytics Dashboard
+- Added analytics tab to progress page with 90-day workout statistics
+- Displays key metrics:
+  - Workout days vs total days (90-day period)
+  - Active rate percentage
+  - Total sets completed
+  - Unique exercises performed
+  - Current workout streak (consecutive days)
+  - Longest workout streak in period
+  - Most active day of the week
+- Implemented tab system matching exercise tracker design
+- Added color-coded stat cards with icons for visual appeal
+- Responsive grid layout (1 column mobile, 2 columns desktop)
+- Empty state for users with no workouts in 90-day period
+
+### 🎨 UI Improvements
+- Progress page now has "Progress" and "Analytics" tabs
+- Consistent tab styling across exercise tracker and progress page
+- Uses existing Card component for design consistency
+
 ## 2024-02-07 - App Router Migration & Performance Optimization
 
 ### 🚀 Next.js App Router Migration
