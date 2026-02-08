@@ -107,3 +107,5 @@ export { cn } from '@/app/lib/utils';
 export { Spinner, SpinnerInline } from './spinner';
 export { SetNumberBadge } from './set-number-badge';
 export { IconContainer } from './icon-container';
+export { FormInput } from './form-input';
+export { FormSelect } from './form-select';
