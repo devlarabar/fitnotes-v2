@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MessageSquare, Save, X } from 'lucide-react';
 import { Button, Card, SpinnerInline } from './ui';
 import { Textarea } from './ui/form/textarea';
@@ -20,6 +20,11 @@ export function DayComment({ date, initialComment, onUpdate }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState('');
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setIsEditing(false);
+    setEditValue('');
+  }, [date]);
 
   const handleStartEdit = () => {
     setEditValue(initialComment?.comment || '');
@@ -133,8 +138,8 @@ export function DayComment({ date, initialComment, onUpdate }: Props) {
   };
 
   return (
-    <Card className={`transition-all ${isEditing ? 'h-auto' : 'h-24'} overflow-hidden`}>
-      <div className={`p-0 h-full overflow-y-auto`}>
+    <Card className={`transition-all ${isEditing ? 'h-auto' : 'h-24 overflow-hidden'}`}>
+      <div className={`p-0 h-full ${!isEditing ? 'overflow-y-auto' : ''}`}>
         {isEditing ? (
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-sm font-bold text-text-secondary">
