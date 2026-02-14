@@ -37,7 +37,10 @@ interface Props {
 
 export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
   const { user } = useUser();
-  const { weightUnits, distanceUnits, workouts, deleteWorkout } = useWorkoutData();
+  const {
+    weightUnits, distanceUnits, workouts,
+    deleteWorkout, updateWorkout,
+  } = useWorkoutData();
   const [activeTab, setActiveTab] = useState<'sets' | 'history' | 'progress'>('sets');
   const [setDate, setSetDate] = useState(date);
   const [currentSet, setCurrentSet] = useState<LocalSet>({
@@ -122,6 +125,17 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
           .eq('id', editingSetId);
 
         if (error) throw error;
+        updateWorkout(editingSetId, {
+          weight: currentSet.weight || undefined,
+          weight_unit: currentSet.weight_unit || undefined,
+          reps: currentSet.reps || undefined,
+          distance: currentSet.distance || undefined,
+          distance_unit: currentSet.distance_unit || undefined,
+          time: normalizeTimeForDb(
+            currentSet.time, measurementType
+          ) || undefined,
+          comment: currentSet.comment || undefined,
+        });
         toast.success('Set updated');
         setEditingSetId(null);
       } else {
