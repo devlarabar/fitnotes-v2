@@ -98,11 +98,9 @@ function WorkoutPageContent() {
     set: any,
     date: Date
   ) => {
-    const setId = await saveSetToSupabase(exerciseId, categoryId, set, date);
-    if (setId) {
-      await refetchHistory();
-    }
-    return setId;
+    return await saveSetToSupabase(
+      exerciseId, categoryId, set, date
+    );
   };
 
   if (loading) {
