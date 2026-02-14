@@ -39,6 +39,7 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
   const { user } = useUser();
   const { weightUnits, distanceUnits, workouts, deleteWorkout } = useWorkoutData();
   const [activeTab, setActiveTab] = useState<'sets' | 'history' | 'progress'>('sets');
+  const [setDate, setSetDate] = useState(date);
   const [currentSet, setCurrentSet] = useState<LocalSet>({
     weight: 0,
     weight_unit: weightUnits[0]?.id || 1,
@@ -57,7 +58,7 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
   useEffect(() => {
     fetchLastSetData();
     updateTodaySetsFromCache();
-  }, [exercise.id, date, workouts]);
+  }, [exercise.id, setDate, workouts]);
 
   const formatDate = (date: Date): string => {
     const year = date.getFullYear();
@@ -96,8 +97,8 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
   };
 
   const updateTodaySetsFromCache = () => {
-    const dateStr = formatDate(date);
-    const sets = workouts.filter(w => 
+    const dateStr = formatDate(setDate);
+    const sets = workouts.filter(w =>
       w.exercise === exercise.id && w.date === dateStr
     );
     setTodaySets(sets);
@@ -132,7 +133,7 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
           exercise.id,
           exercise.category || 1,
           normalizedSet,
-          date
+          setDate
         );
 
         if (!setId) {
@@ -255,6 +256,8 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
             <div className="space-y-6">
               <SetForm
                 set={currentSet}
+                date={setDate}
+                onDateChange={setSetDate}
                 measurementType={measurementType}
                 isEditing={!!editingSetId}
                 saving={saving}
@@ -265,6 +268,7 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
 
               <TodaySetsList
                 sets={todaySets}
+                date={setDate}
                 editingSetId={editingSetId}
                 onEdit={handleEditSet}
                 onDelete={handleDeleteSet}
