@@ -17,6 +17,8 @@ interface LocalSet {
 
 interface Props {
   set: LocalSet;
+  date: Date;
+  onDateChange: (date: Date) => void;
   measurementType?: string;
   isEditing: boolean;
   saving: boolean;
@@ -27,6 +29,8 @@ interface Props {
 
 export function SetForm({
   set,
+  date,
+  onDateChange,
   measurementType,
   isEditing,
   saving,
@@ -39,9 +43,11 @@ export function SetForm({
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <div className="flex items-end gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <SetInputs
             set={{ id: 'current', ...set }}
+            date={date}
+            onDateChange={onDateChange}
             measurementType={measurementType}
             weightUnits={weightUnits}
             distanceUnits={distanceUnits}

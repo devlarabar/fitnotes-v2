@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { WeightUnit, DistanceUnit } from '@/app/lib/schema';
 import { Input } from './ui';
+import { Calendar, Dumbbell, Ruler } from 'lucide-react';
 
 interface LocalSet {
   id: string | number;
@@ -15,10 +16,47 @@ interface LocalSet {
 
 interface Props {
   set: LocalSet;
+  date?: Date;
+  onDateChange?: (date: Date) => void;
   measurementType?: string;
   weightUnits: WeightUnit[];
   distanceUnits: DistanceUnit[];
   onUpdate: (updates: Partial<LocalSet>) => void;
+}
+
+const labelClass = "block text-[10px] font-black text-text-subtle uppercase tracking-tighter mb-1 px-1";
+const selectWrapClass = "flex items-center gap-2 bg-bg-primary border border-border-primary rounded-xl py-2 px-3 focus-within:border-accent-primary transition-all";
+const selectClass = "bg-transparent text-text-primary text-sm font-bold outline-none flex-1 cursor-pointer";
+
+function formatDateStr(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function DateInput({ date, onChange }: {
+  date: Date;
+  onChange: (d: Date) => void;
+}) {
+  return (
+    <div>
+      <label className={labelClass}>Date</label>
+      <div className={selectWrapClass}>
+        <Calendar size={14} className="text-text-subtle shrink-0" />
+        <input
+          type="date"
+          value={formatDateStr(date)}
+          onChange={(e) => {
+            const [y, m, d] = e.target.value
+              .split('-').map(Number);
+            onChange(new Date(y, m - 1, d));
+          }}
+          className="bg-transparent text-text-primary text-sm font-bold outline-none flex-1 cursor-pointer"
+        />
+      </div>
+    </div>
+  );
 }
 
 function TimeInput({ value, onChange, label, className }: {
@@ -130,31 +168,45 @@ function TimeInput({ value, onChange, label, className }: {
   );
 }
 
-export function SetInputs({ set, measurementType, weightUnits, distanceUnits, onUpdate }: Props) {
+export function SetInputs({
+  set, date, onDateChange, measurementType,
+  weightUnits, distanceUnits, onUpdate
+}: Props) {
   const type = measurementType?.toLowerCase() || '';
+
+  const dateCell = date && onDateChange ? (
+    <DateInput date={date} onChange={onDateChange} />
+  ) : null;
 
   // Distance (with time)
   if (type === 'distance') {
     return (
       <>
-        <div className="flex-1 flex gap-2">
-          <Input
-            label="Distance"
-            type="number"
-            step="0.1"
-            value={set.distance || ''}
-            onChange={e => onUpdate({ distance: parseFloat(e.target.value) || 0 })}
-          />
-          <select
-            value={set.distance_unit || distanceUnits[0]?.id}
-            onChange={e => onUpdate({ distance_unit: parseInt(e.target.value) })}
-            className="bg-bg-primary border border-border-primary rounded-xl px-2 text-text-primary focus:border-accent-primary outline-none transition-all text-sm font-bold mt-5"
-          >
-            {distanceUnits.map(unit => (
-              <option key={unit.id} value={unit.id}>{unit.name}</option>
-            ))}
-          </select>
+        {dateCell}
+        <div>
+          <label className={labelClass}>Unit</label>
+          <div className={selectWrapClass}>
+            <Ruler size={14} className="text-text-subtle shrink-0" />
+            <select
+              value={set.distance_unit || distanceUnits[0]?.id}
+              onChange={e => onUpdate({ distance_unit: parseInt(e.target.value) })}
+              className={selectClass}
+            >
+              {distanceUnits.map(unit => (
+                <option key={unit.id} value={unit.id}>
+                  {unit.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
+        <Input
+          label="Distance"
+          type="number"
+          step="0.1"
+          value={set.distance || ''}
+          onChange={e => onUpdate({ distance: parseFloat(e.target.value) || 0 })}
+        />
         <TimeInput
           label="Time"
           value={set.time || ''}
@@ -167,36 +219,46 @@ export function SetInputs({ set, measurementType, weightUnits, distanceUnits, on
   // Time Only
   if (type === 'time') {
     return (
-      <TimeInput
-        label="Time"
-        value={set.time || ''}
-        onChange={time => onUpdate({ time })}
-        className="flex-1"
-      />
+      <>
+        {dateCell}
+        <div />
+        <TimeInput
+          label="Time"
+          value={set.time || ''}
+          onChange={time => onUpdate({ time })}
+          className="col-span-2"
+        />
+      </>
     );
   }
 
-  // Reps (with weight) - most common for strength training
-  // This includes bodyweight exercises where you might add weight (weighted pull-ups, etc.)
+  // Reps (with weight)
   return (
     <>
-      <div className="flex-1 flex gap-2">
-        <Input
-          label="Weight"
-          type="number"
-          value={set.weight || ''}
-          onChange={e => onUpdate({ weight: parseFloat(e.target.value) || 0 })}
-        />
-        <select
-          value={set.weight_unit || weightUnits[0]?.id}
-          onChange={e => onUpdate({ weight_unit: parseInt(e.target.value) })}
-          className="bg-bg-primary border border-border-primary rounded-xl px-2 text-text-primary focus:border-accent-primary outline-none transition-all text-sm font-bold mt-5"
-        >
-          {weightUnits.map(unit => (
-            <option key={unit.id} value={unit.id}>{unit.name}</option>
-          ))}
-        </select>
+      {dateCell}
+      <div>
+        <label className={labelClass}>Unit</label>
+        <div className={selectWrapClass}>
+          <Dumbbell size={14} className="text-text-subtle shrink-0" />
+          <select
+            value={set.weight_unit || weightUnits[0]?.id}
+            onChange={e => onUpdate({ weight_unit: parseInt(e.target.value) })}
+            className={selectClass}
+          >
+            {weightUnits.map(unit => (
+              <option key={unit.id} value={unit.id}>
+                {unit.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
+      <Input
+        label="Weight"
+        type="number"
+        value={set.weight || ''}
+        onChange={e => onUpdate({ weight: parseFloat(e.target.value) || 0 })}
+      />
       <Input
         label="Reps"
         type="number"
