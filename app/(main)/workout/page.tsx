@@ -41,7 +41,8 @@ function WorkoutPageContent() {
     const exerciseIdParam = searchParams.get('exerciseId');
 
     if (dateParam) {
-      setViewDate(new Date(dateParam));
+      const [y, m, d] = dateParam.split('-').map(Number);
+      setViewDate(new Date(y, m - 1, d));
     }
 
     if (exerciseIdParam) {
@@ -89,7 +90,9 @@ function WorkoutPageContent() {
   const hasWorkoutsForDay = groupedWorkouts.length > 0;
 
   const handleOpenSelector = () => {
-    router.push('/workout/category');
+    const params = new URLSearchParams();
+    params.set('date', viewDateStr);
+    router.push(`/workout/category?${params}`);
   };
 
   const handleSaveSet = async (
@@ -115,7 +118,9 @@ function WorkoutPageContent() {
         onSaveSet={handleSaveSet}
         onBack={() => {
           setTrackingExercise(null);
-          router.push('/workout');
+          const params = new URLSearchParams();
+          params.set('date', viewDateStr);
+          router.push(`/workout?${params}`);
         }}
       />
     );
