@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/app/lib/supabase';
 import { Workout } from '@/app/lib/schema';
 import { useUser } from '@/app/contexts/user-context';
+import { timeToSeconds } from '@/app/lib/time';
 
 type TimeRange = '30d' | '90d' | '1y' | 'all';
 
@@ -75,11 +76,6 @@ export function useExerciseProgress(
   const getPRStats = () => {
     if (history.length === 0) return null;
 
-    const timeToSeconds = (t: string): number => {
-      const [mins, secs] = t.split(':').map(Number);
-      return (mins || 0) * 60 + (secs || 0);
-    };
-
     if (measurementType !== 'distance' && measurementType !== 'time') {
       const maxWeight = Math.max(...history.map(s => s.weight || 0));
       const setsAtMaxWeight = history.filter(s => s.weight === maxWeight);
@@ -151,11 +147,6 @@ export function useExerciseProgress(
 
   const getChartData = (timeRange: TimeRange) => {
     const filtered = getFilteredData(timeRange);
-
-    const timeToSeconds = (t: string): number => {
-      const [mins, secs] = t.split(':').map(Number);
-      return (mins || 0) * 60 + (secs || 0);
-    };
 
     const grouped = filtered.reduce((acc, set) => {
       const existing = acc.find(d => d.date === set.date);
