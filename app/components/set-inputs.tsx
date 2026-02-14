@@ -50,14 +50,14 @@ function TimeInput({ value, onChange, label, className }: {
       onChange('');
       return;
     }
-    const combined = `${h || '0'}:${m.padStart(2, '0')}:${s.padStart(2, '0')}`;
+    const combined = `${(h || '0').padStart(2, '0')}:${m.padStart(2, '0')}:${s.padStart(2, '0')}`;
     lastEmitted.current = combined;
     onChange(combined);
   };
 
   const handleChange = (field: 'h' | 'm' | 's', input: string) => {
     const digits = input.replace(/\D/g, '');
-    const maxLen = field === 'h' ? 1 : 2;
+    const maxLen = 2;
     const val = digits.slice(0, maxLen);
 
     if ((field === 'm' || field === 's') && val.length === 2 && parseInt(val) > 59) {
@@ -75,7 +75,7 @@ function TimeInput({ value, onChange, label, className }: {
   const handleBlur = () => {
     if (!fields.h && !fields.m && !fields.s) return;
     setFields(prev => ({
-      h: prev.h || '0',
+      h: prev.h ? prev.h.padStart(2, '0') : '00',
       m: prev.m ? prev.m.padStart(2, '0') : '00',
       s: prev.s ? prev.s.padStart(2, '0') : '00'
     }));
@@ -95,8 +95,8 @@ function TimeInput({ value, onChange, label, className }: {
           type="text"
           inputMode="numeric"
           value={fields.h}
-          placeholder="H"
-          className={`w-5 ${fieldClass} placeholder:text-text-faint`}
+          placeholder="HH"
+          className={`w-8 ${fieldClass} placeholder:text-text-faint`}
           onChange={e => handleChange('h', e.target.value)}
           onFocus={e => e.target.select()}
           onBlur={handleBlur}

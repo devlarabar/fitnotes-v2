@@ -23,7 +23,7 @@ export function normalizeTimeForDb(
   if (type !== 'time' && type !== 'distance') {
     return null;
   }
-  if (!time || time === '0:00:00') {
+  if (!time || time === '00:00:00') {
     return null;
   }
   return time;
