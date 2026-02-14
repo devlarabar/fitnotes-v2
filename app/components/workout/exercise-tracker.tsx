@@ -268,6 +268,7 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
 
               <TodaySetsList
                 sets={todaySets}
+                date={setDate}
                 editingSetId={editingSetId}
                 onEdit={handleEditSet}
                 onDelete={handleDeleteSet}

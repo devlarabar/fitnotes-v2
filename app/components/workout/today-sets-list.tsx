@@ -5,18 +5,28 @@ import { Button, SetNumberBadge } from '../ui';
 
 interface Props {
   sets: Workout[];
+  date: Date;
   editingSetId: number | null;
   onEdit: (set: Workout) => void;
   onDelete: (setId: number) => void;
 }
 
-export function TodaySetsList({ sets, editingSetId, onEdit, onDelete }: Props) {
+export function TodaySetsList({ sets, date, editingSetId, onEdit, onDelete }: Props) {
   if (sets.length === 0) return null;
+
+  const isToday = date.toDateString() === new Date().toDateString();
+  const dateLabel = isToday
+    ? 'today'
+    : date.toLocaleDateString('en-US', {
+      month: 'short', day: 'numeric'
+    });
+  const count = sets.length;
+  const label = `${count} set${count !== 1 ? 's' : ''} for ${dateLabel}`;
 
   return (
     <div className="space-y-2 pt-4 border-t border-border-primary">
       <p className="text-xs text-text-dim font-bold uppercase tracking-wider">
-        Today&apos;s Sets ({sets.length})
+        {label}
       </p>
       <div className="space-y-2">
         {sets.map((set, idx) => (
