@@ -50,7 +50,7 @@ export function Sidebar({ activeTab, setActiveTab }: Props) {
     <nav
       className={`
         hidden md:flex flex-col w-64 fixed left-0 top-0 bottom-0 
-        bg-bg-primary border-r border-border-secondary p-8 z-100
+        bg-bg-primary border-r border-border-secondary p-8 z-40
       `}
     >
       <div className="flex items-center gap-4 mb-12">
@@ -141,7 +141,7 @@ export function MobileNav({ activeTab, setActiveTab }: Props) {
         fixed bottom-0 left-0 right-0 bg-bg-primary/80 
         backdrop-blur-xl border-t border-border-secondary 
         flex justify-around items-center px-4 py-3 
-        md:hidden z-100 pb-safe
+        md:hidden z-40 pb-safe
       `}
     >
       {navItems.map((item) => (
