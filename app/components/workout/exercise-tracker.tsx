@@ -36,7 +36,7 @@ interface Props {
 
 export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
   const { user } = useUser();
-  const { weightUnits, distanceUnits, workouts, refetch } = useWorkoutData();
+  const { weightUnits, distanceUnits, workouts, deleteWorkout } = useWorkoutData();
   const [activeTab, setActiveTab] = useState<'sets' | 'history' | 'progress'>('sets');
   const [currentSet, setCurrentSet] = useState<LocalSet>({
     weight: 0,
@@ -188,7 +188,7 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
       if (error) throw error;
 
       toast.success('Set deleted');
-      updateTodaySetsFromCache();
+      deleteWorkout(setId);
 
       if (editingSetId === setId) {
         setEditingSetId(null);
