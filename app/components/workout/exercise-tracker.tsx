@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useWorkoutData } from '@/app/contexts/workout-data-context';
 import { useUser } from '@/app/contexts/user-context';
 import { normalizeTimeForDb } from '@/app/lib/time';
+import { ConfirmModal } from '@/app/components/ui/confirm-modal';
 
 interface LocalSet {
   weight?: number;
@@ -36,7 +37,7 @@ interface Props {
 
 export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
   const { user } = useUser();
-  const { weightUnits, distanceUnits, workouts, refetch } = useWorkoutData();
+  const { weightUnits, distanceUnits, workouts, deleteWorkout } = useWorkoutData();
   const [activeTab, setActiveTab] = useState<'sets' | 'history' | 'progress'>('sets');
   const [currentSet, setCurrentSet] = useState<LocalSet>({
     weight: 0,
@@ -49,6 +50,7 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
   const [saving, setSaving] = useState(false);
   const [todaySets, setTodaySets] = useState<Workout[]>([]);
   const [editingSetId, setEditingSetId] = useState<number | null>(null);
+  const [deleteSetId, setDeleteSetId] = useState<number | null>(null);
 
   const measurementType = exercise.measurement_type?.name;
 
@@ -176,32 +178,45 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
     fetchLastSetData();
   };
 
-  const handleDeleteSet = async (setId: number) => {
-    if (!confirm('Delete this set?')) return;
+  const handleDeleteSet = (setId: number) => {
+    setDeleteSetId(setId);
+  };
+
+  const confirmDeleteSet = async () => {
+    if (!deleteSetId) return;
 
     try {
       const { error } = await supabase
         .from('workouts')
         .delete()
-        .eq('id', setId);
+        .eq('id', deleteSetId);
 
       if (error) throw error;
 
       toast.success('Set deleted');
-      updateTodaySetsFromCache();
+      deleteWorkout(deleteSetId);
 
-      if (editingSetId === setId) {
+      if (editingSetId === deleteSetId) {
         setEditingSetId(null);
         fetchLastSetData();
       }
     } catch (err) {
       console.error('Error deleting set:', err);
       toast.error('Failed to delete');
+    } finally {
+      setDeleteSetId(null);
     }
   };
 
   return (
     <div className="space-y-6">
+      <ConfirmModal
+        open={deleteSetId !== null}
+        onOpenChange={(open) => { if (!open) setDeleteSetId(null); }}
+        title="Delete this set?"
+        description="This action cannot be undone."
+        onConfirm={confirmDeleteSet}
+      />
       <TrackerHeader exercise={exercise} onBack={onBack} />
 
       <Card className="p-0 overflow-hidden">
