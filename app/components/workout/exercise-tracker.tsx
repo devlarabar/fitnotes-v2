@@ -10,6 +10,7 @@ import { supabase } from '@/app/lib/supabase';
 import { toast } from 'sonner';
 import { useWorkoutData } from '@/app/contexts/workout-data-context';
 import { useUser } from '@/app/contexts/user-context';
+import { normalizeTimeForDb } from '@/app/lib/time';
 
 interface LocalSet {
   weight?: number;
@@ -43,7 +44,6 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
     reps: 0,
     distance: 0,
     distance_unit: distanceUnits[0]?.id || 1,
-    time: '00:00',
     comment: ''
   });
   const [saving, setSaving] = useState(false);
@@ -83,9 +83,8 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
           weight: data.weight || 0,
           weight_unit: data.weight_unit || weightUnits[0]?.id || 1,
           reps: data.reps || 0,
-          distance: data.distance || 0,
+          distance: 0,
           distance_unit: data.distance_unit || distanceUnits[0]?.id || 1,
-          time: data.time || '00:00',
           comment: ''
         });
       }
@@ -114,7 +113,7 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
             reps: currentSet.reps || null,
             distance: currentSet.distance || null,
             distance_unit: currentSet.distance_unit || null,
-            time: currentSet.time || null,
+            time: normalizeTimeForDb(currentSet.time, measurementType),
             comment: currentSet.comment || null
           })
           .eq('id', editingSetId);
@@ -123,10 +122,14 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
         toast.success('Set updated');
         setEditingSetId(null);
       } else {
+        const normalizedSet = {
+          ...currentSet,
+          time: normalizeTimeForDb(currentSet.time, measurementType),
+        };
         const setId = await onSaveSet(
           exercise.id,
           exercise.category || 1,
-          currentSet,
+          normalizedSet,
           date
         );
 
@@ -163,7 +166,7 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
       reps: set.reps || 0,
       distance: set.distance || 0,
       distance_unit: set.distance_unit || distanceUnits[0]?.id || 1,
-      time: set.time || '00:00',
+      time: set.time || undefined,
       comment: set.comment || ''
     });
   };

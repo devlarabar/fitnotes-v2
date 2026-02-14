@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { Workout } from './schema';
+import { timeToSeconds } from './time';
 
 /**
  * Checks if a new set is a personal record for the given exercise.
@@ -64,12 +64,7 @@ export async function checkIsPR(
     }
 
     // Distance + Time exercises (e.g., running)
-    if (distance !== null && distance !== undefined && time && time !== '00:00') {
-      const timeToSeconds = (t: string): number => {
-        const [mins, secs] = t.split(':').map(Number);
-        return (mins || 0) * 60 + (secs || 0);
-      };
-
+    if (distance !== null && distance !== undefined && time) {
       const currentSeconds = timeToSeconds(time);
 
       // Check if this is the longest distance
@@ -79,7 +74,7 @@ export async function checkIsPR(
 
       // Check if this is the fastest time ever (across all distances)
       const times = previousSets
-        .filter(s => s.time && s.time !== '00:00')
+        .filter(s => s.time)
         .map(s => timeToSeconds(s.time!));
 
       if (times.length > 0) {
@@ -107,12 +102,7 @@ export async function checkIsPR(
       if (distance > maxDistance) return true;
     }
     // Time only exercises (e.g., plank)
-    else if (time && time !== '00:00') {
-      const timeToSeconds = (t: string): number => {
-        const [mins, secs] = t.split(':').map(Number);
-        return (mins || 0) * 60 + (secs || 0);
-      };
-
+    else if (time) {
       const currentSeconds = timeToSeconds(time);
       const maxSeconds = Math.max(
         ...previousSets

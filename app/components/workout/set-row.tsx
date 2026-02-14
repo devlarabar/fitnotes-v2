@@ -7,6 +7,7 @@ import { SetInputs } from '../set-inputs';
 import { useWorkoutData } from '@/app/contexts/workout-data-context';
 import { supabase } from '@/app/lib/supabase';
 import { toast } from 'sonner';
+import { normalizeTimeForDb } from '@/app/lib/time';
 
 interface Props {
   set: Workout;
@@ -45,7 +46,7 @@ export function SetRow({ set, index, measurementType, onUpdate }: Props) {
           reps: editedSet.reps || null,
           distance: editedSet.distance || null,
           distance_unit: editedSet.distance_unit || null,
-          time: editedSet.time || null,
+          time: normalizeTimeForDb(editedSet.time, measurementType),
           comment: editedSet.comment || null
         })
         .eq('id', editedSet.id);

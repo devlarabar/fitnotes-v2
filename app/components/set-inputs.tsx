@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { WeightUnit, DistanceUnit } from '@/app/lib/schema';
 import { Input } from './ui';
 
@@ -19,6 +19,115 @@ interface Props {
   weightUnits: WeightUnit[];
   distanceUnits: DistanceUnit[];
   onUpdate: (updates: Partial<LocalSet>) => void;
+}
+
+function TimeInput({ value, onChange, label, className }: {
+  value: string;
+  onChange: (time: string) => void;
+  label?: string;
+  className?: string;
+}) {
+  const parse = (v: string) => {
+    const p = (v || '').split(':');
+    return { h: p[0] || '', m: p[1] || '', s: p[2] || '' };
+  };
+
+  const [fields, setFields] = useState(() => parse(value));
+  const lastEmitted = useRef(value);
+  const minsRef = useRef<HTMLInputElement>(null);
+  const secsRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (value !== lastEmitted.current) {
+      setFields(parse(value));
+      lastEmitted.current = value;
+    }
+  }, [value]);
+
+  const emit = (h: string, m: string, s: string) => {
+    if (!h && !m && !s) {
+      lastEmitted.current = '';
+      onChange('');
+      return;
+    }
+    const combined = `${(h || '0').padStart(2, '0')}:${m.padStart(2, '0')}:${s.padStart(2, '0')}`;
+    lastEmitted.current = combined;
+    onChange(combined);
+  };
+
+  const handleChange = (field: 'h' | 'm' | 's', input: string) => {
+    const digits = input.replace(/\D/g, '');
+    const maxLen = 2;
+    const val = digits.slice(0, maxLen);
+
+    if ((field === 'm' || field === 's') && val.length === 2 && parseInt(val) > 59) {
+      return;
+    }
+
+    const newFields = { ...fields, [field]: val };
+    setFields(newFields);
+    emit(newFields.h, newFields.m, newFields.s);
+
+    if (field === 'h' && val.length === 1) minsRef.current?.focus();
+    if (field === 'm' && val.length === 2) secsRef.current?.focus();
+  };
+
+  const handleBlur = () => {
+    if (!fields.h && !fields.m && !fields.s) return;
+    setFields(prev => ({
+      h: prev.h ? prev.h.padStart(2, '0') : '00',
+      m: prev.m ? prev.m.padStart(2, '0') : '00',
+      s: prev.s ? prev.s.padStart(2, '0') : '00'
+    }));
+  };
+
+  const fieldClass = "text-center font-bold text-text-primary bg-transparent outline-none";
+
+  return (
+    <div className={`flex-1 ${className || ''}`}>
+      {label && (
+        <label className="block text-[10px] font-black text-text-subtle uppercase tracking-tighter mb-1 px-1">
+          {label}
+        </label>
+      )}
+      <div className="flex items-center justify-center gap-1 bg-bg-primary border border-border-primary rounded-xl py-2 px-3 focus-within:border-accent-primary transition-all">
+        <input
+          type="text"
+          inputMode="numeric"
+          value={fields.h}
+          placeholder="HH"
+          className={`w-8 ${fieldClass} placeholder:text-text-faint`}
+          onChange={e => handleChange('h', e.target.value)}
+          onFocus={e => e.target.select()}
+          onBlur={handleBlur}
+        />
+        <span className="text-text-subtle font-bold">:</span>
+        <input
+          ref={minsRef}
+          type="text"
+          inputMode="numeric"
+          value={fields.m}
+          placeholder="MM"
+          className={`w-8 ${fieldClass} placeholder:text-text-faint`}
+          onChange={e => handleChange('m', e.target.value)}
+          onFocus={e => e.target.select()}
+          onBlur={handleBlur}
+        />
+        <span className="text-text-subtle font-bold">:</span>
+        <input
+          ref={secsRef}
+          type="text"
+          inputMode="numeric"
+          value={fields.s}
+          placeholder="SS"
+          className={`w-8 ${fieldClass} placeholder:text-text-faint`}
+          onChange={e => handleChange('s', e.target.value)}
+          onFocus={e => e.target.select()}
+          onBlur={handleBlur}
+        />
+      </div>
+    </div>
+  );
 }
 
 export function SetInputs({ set, measurementType, weightUnits, distanceUnits, onUpdate }: Props) {
@@ -46,12 +155,10 @@ export function SetInputs({ set, measurementType, weightUnits, distanceUnits, on
             ))}
           </select>
         </div>
-        <Input
+        <TimeInput
           label="Time"
-          type="text"
-          placeholder="MM:SS"
           value={set.time || ''}
-          onChange={e => onUpdate({ time: e.target.value })}
+          onChange={time => onUpdate({ time })}
         />
       </>
     );
@@ -60,12 +167,10 @@ export function SetInputs({ set, measurementType, weightUnits, distanceUnits, on
   // Time Only
   if (type === 'time') {
     return (
-      <Input
+      <TimeInput
         label="Time"
-        type="text"
-        placeholder="MM:SS"
         value={set.time || ''}
-        onChange={e => onUpdate({ time: e.target.value })}
+        onChange={time => onUpdate({ time })}
         className="flex-1"
       />
     );
