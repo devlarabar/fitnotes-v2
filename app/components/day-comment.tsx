@@ -133,8 +133,8 @@ export function DayComment({ date, initialComment, onUpdate }: Props) {
   };
 
   return (
-    <Card className={`transition-all ${isEditing ? 'h-auto' : 'h-24'} overflow-hidden`}>
-      <div className={`p-0 h-full overflow-y-auto`}>
+    <Card className={`transition-all ${isEditing ? 'h-auto' : 'h-24 overflow-hidden'}`}>
+      <div className={`p-0 h-full ${!isEditing ? 'overflow-y-auto' : ''}`}>
         {isEditing ? (
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-sm font-bold text-text-secondary">
