@@ -8,6 +8,7 @@ import { useWorkoutData } from '@/app/contexts/workout-data-context';
 import { supabase } from '@/app/lib/supabase';
 import { toast } from 'sonner';
 import { normalizeTimeForDb } from '@/app/lib/time';
+import { ConfirmModal } from '@/app/components/ui/confirm-modal';
 
 interface Props {
   set: Workout;
@@ -21,6 +22,7 @@ export function SetRow({ set, index, measurementType, onUpdate }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedSet, setEditedSet] = useState(set);
   const [saving, setSaving] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleSave = async () => {
     setSaving(true);
@@ -66,9 +68,11 @@ export function SetRow({ set, index, measurementType, onUpdate }: Props) {
     }
   };
 
-  const handleDelete = async () => {
-    if (!confirm('Delete this set?')) return;
+  const handleDelete = () => {
+    setShowDeleteConfirm(true);
+  };
 
+  const confirmDelete = async () => {
     // Optimistically delete from cache
     const backup = { ...set };
     deleteWorkout(set.id);
@@ -96,52 +100,67 @@ export function SetRow({ set, index, measurementType, onUpdate }: Props) {
     setIsEditing(false);
   };
 
+  const deleteModal = (
+    <ConfirmModal
+      open={showDeleteConfirm}
+      onOpenChange={setShowDeleteConfirm}
+      title="Delete this set?"
+      description="This action cannot be undone."
+      onConfirm={confirmDelete}
+    />
+  );
+
   if (isEditing) {
     return (
-      <div className="space-y-2 p-2 bg-accent-primary/10 rounded-xl border border-accent-primary/30">
-        <div className="flex items-end gap-3">
-          <div className="w-6 pb-3 text-center text-xs font-bold text-accent-secondary">
-            {index + 1}
+      <>
+        {deleteModal}
+        <div className="space-y-2 p-2 bg-accent-primary/10 rounded-xl border border-accent-primary/30">
+          <div className="flex items-end gap-3">
+            <div className="w-6 pb-3 text-center text-xs font-bold text-accent-secondary">
+              {index + 1}
+            </div>
+            <SetInputs
+              set={editedSet}
+              measurementType={measurementType}
+              weightUnits={weightUnits}
+              distanceUnits={distanceUnits}
+              onUpdate={(updates) => setEditedSet(prev => ({ ...prev, ...updates } as Workout))}
+            />
+            <div className="flex gap-2 mb-1.5">
+              <Button
+                variant="ghost"
+                onClick={handleCancel}
+                className="p-2 h-auto text-text-primary0 hover:text-text-primary"
+                disabled={saving}
+              >
+                <X size={16} />
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleSave}
+                className="p-2 h-auto"
+                disabled={saving}
+              >
+                {saving ? <SpinnerInline /> : <Save size={16} />}
+              </Button>
+            </div>
           </div>
-          <SetInputs
-            set={editedSet}
-            measurementType={measurementType}
-            weightUnits={weightUnits}
-            distanceUnits={distanceUnits}
-            onUpdate={(updates) => setEditedSet(prev => ({ ...prev, ...updates } as Workout))}
+          <Textarea
+            placeholder="Add a note (optional)"
+            value={editedSet.comment || ''}
+            onChange={(e) => setEditedSet(prev => ({ ...prev, comment: e.target.value }))}
+            className="bg-bg-tertiary border-border-primary text-text-primary"
           />
-          <div className="flex gap-2 mb-1.5">
-            <Button
-              variant="ghost"
-              onClick={handleCancel}
-              className="p-2 h-auto text-text-primary0 hover:text-text-primary"
-              disabled={saving}
-            >
-              <X size={16} />
-            </Button>
-            <Button
-              variant="primary"
-              onClick={handleSave}
-              className="p-2 h-auto"
-              disabled={saving}
-            >
-              {saving ? <SpinnerInline /> : <Save size={16} />}
-            </Button>
-          </div>
         </div>
-        <Textarea
-          placeholder="Add a note (optional)"
-          value={editedSet.comment || ''}
-          onChange={(e) => setEditedSet(prev => ({ ...prev, comment: e.target.value }))}
-          className="bg-bg-tertiary border-border-primary text-text-primary"
-        />
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="bg-bg-secondary/50 rounded-xl">
-      <div
+    <>
+      {deleteModal}
+      <div className="bg-bg-secondary/50 rounded-xl">
+        <div
         className="flex items-center gap-3 p-2 cursor-pointer hover:bg-bg-secondary transition-colors"
         onClick={() => setIsEditing(true)}
       >
@@ -189,5 +208,6 @@ export function SetRow({ set, index, measurementType, onUpdate }: Props) {
         </Button>
       </div>
     </div>
+    </>
   );
 }
