@@ -3,14 +3,16 @@ import { useRouter } from 'next/navigation';
 import { Button, Card } from './ui';
 import { signOut } from '@/app/lib/auth';
 import { toast } from 'sonner';
-import { LogOut } from 'lucide-react';
+import { LogOut, Sun, Moon } from 'lucide-react';
 import { useAuth } from '@/app/hooks/use-auth';
 import { useUser } from '@/app/contexts/user-context';
+import { useTheme } from '@/app/contexts/theme-context';
 
 export function SettingsPage() {
   const router = useRouter();
   const { user: authUser } = useAuth();
   const { user: dbUser } = useUser();
+  const { theme, toggleTheme } = useTheme();
 
   const handleSignOut = async () => {
     const { error } = await signOut();
@@ -54,6 +56,37 @@ export function SettingsPage() {
         <h2 className="text-2xl font-black text-text-primary">Settings</h2>
         <p className="text-text-muted mt-2">v2.0.0 (Next.js + Supabase)</p>
       </div>
+
+      <Card className="p-6 space-y-4">
+        <div>
+          <p className="text-xs text-text-dim uppercase
+            tracking-wider mb-1"
+          >
+            Appearance
+          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-text-secondary">
+              {theme === 'dark' ? 'Dark' : 'Light'} Mode
+            </p>
+            <button
+              onClick={toggleTheme}
+              className="flex items-center gap-2 px-4 py-2
+                rounded-xl bg-bg-tertiary text-text-secondary
+                hover:text-text-primary transition-all
+                duration-300 font-bold hover:cursor-pointer"
+            >
+              {theme === 'dark'
+                ? <Sun size={18} />
+                : <Moon size={18} />
+              }
+              {theme === 'dark'
+                ? 'Light Mode'
+                : 'Dark Mode'
+              }
+            </button>
+          </div>
+        </div>
+      </Card>
 
       <Card className="p-6 space-y-4">
         <div>
