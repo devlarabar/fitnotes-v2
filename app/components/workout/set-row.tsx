@@ -15,9 +15,10 @@ interface Props {
   index: number;
   measurementType?: string;
   onUpdate: () => void;
+  readOnly?: boolean;
 }
 
-export function SetRow({ set, index, measurementType, onUpdate }: Props) {
+export function SetRow({ set, index, measurementType, onUpdate, readOnly = false }: Props) {
   const { weightUnits, distanceUnits, updateWorkout, deleteWorkout, addWorkout } = useWorkoutData();
   const [isEditing, setIsEditing] = useState(false);
   const [editedSet, setEditedSet] = useState(set);
@@ -161,8 +162,12 @@ export function SetRow({ set, index, measurementType, onUpdate }: Props) {
       {deleteModal}
       <div className="bg-bg-secondary/50 rounded-xl">
         <div
-        className="flex items-center gap-3 p-2 cursor-pointer hover:bg-bg-secondary transition-colors"
-        onClick={() => setIsEditing(true)}
+        className={`flex items-center gap-3 p-2 transition-colors ${
+          readOnly
+            ? ''
+            : 'cursor-pointer hover:bg-bg-secondary'
+        }`}
+        onClick={readOnly ? undefined : () => setIsEditing(true)}
       >
         <SetNumberBadge number={index + 1} className="bg-bg-tertiary" />
         <div className="flex-1 flex items-center gap-4 text-sm min-w-0">
@@ -196,16 +201,18 @@ export function SetRow({ set, index, measurementType, onUpdate }: Props) {
         {set.is_pr && (
           <Trophy size={16} className="text-yellow-500 shrink-0" />
         )}
-        <Button
-          variant="ghost"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleDelete();
-          }}
-          className="p-2 h-auto text-text-faint hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-        >
-          <Trash2 size={16} />
-        </Button>
+        {!readOnly && (
+          <Button
+            variant="ghost"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDelete();
+            }}
+            className="p-2 h-auto text-text-faint hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <Trash2 size={16} />
+          </Button>
+        )}
       </div>
     </div>
     </>

@@ -8,11 +8,24 @@ interface User {
   auth_user_id: string;
   first_name: string | null;
   last_name: string | null;
-  role: 'dev' | 'user' | 'demo';
+  role: 'dev' | 'user' | 'demo' | 'trainer';
+}
+
+interface TraineeUser {
+  id: number;
+  first_name: string | null;
+  last_name: string | null;
 }
 
 interface UserContextType {
   user: User | null;
+  // For trainers: their assigned trainee; null otherwise
+  trainee: TraineeUser | null;
+  // For trainees: whether they have a trainer assigned
+  hasTrainer: boolean;
+  // The user_id to use for all data queries:
+  // trainee.id when user is a trainer, user.id otherwise
+  effectiveUserId: number | null;
   loading: boolean;
   refreshUser: () => Promise<void>;
 }
@@ -21,6 +34,8 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [trainee, setTrainee] = useState<TraineeUser | null>(null);
+  const [hasTrainer, setHasTrainer] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchUser = async () => {
@@ -28,6 +43,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (!authUser) {
         setUser(null);
+        setTrainee(null);
+        setHasTrainer(false);
         return;
       }
 
@@ -45,6 +62,38 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       }
 
       setUser(data);
+
+      if (data.role === 'trainer') {
+        // Fetch this trainer's assigned trainee
+        const { data: relData } = await supabase
+          .from('trainer_relationships')
+          .select('trainee_id')
+          .eq('trainer_id', data.id)
+          .maybeSingle();
+
+        if (relData?.trainee_id) {
+          const { data: traineeData } = await supabase
+            .from('users')
+            .select('id, first_name, last_name')
+            .eq('id', relData.trainee_id)
+            .single();
+
+          setTrainee(traineeData ?? null);
+        } else {
+          setTrainee(null);
+        }
+        setHasTrainer(false);
+      } else {
+        setTrainee(null);
+        // Check if this user has been assigned a trainer
+        const { data: relData } = await supabase
+          .from('trainer_relationships')
+          .select('id')
+          .eq('trainee_id', data.id)
+          .maybeSingle();
+
+        setHasTrainer(!!relData);
+      }
     } catch (err) {
       console.error('Error in fetchUser:', err);
       setUser(null);
@@ -56,12 +105,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     fetchUser();
 
-    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN') {
         fetchUser();
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
+        setTrainee(null);
+        setHasTrainer(false);
       }
     });
 
@@ -74,8 +124,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     await fetchUser();
   };
 
+  const effectiveUserId: number | null =
+    user?.role === 'trainer' ? (trainee?.id ?? null) : (user?.id ?? null);
+
   return (
-    <UserContext.Provider value={{ user, loading, refreshUser }}>
+    <UserContext.Provider
+      value={{ user, trainee, hasTrainer, effectiveUserId, loading, refreshUser }}
+    >
       {children}
     </UserContext.Provider>
   );

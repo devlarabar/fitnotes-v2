@@ -17,13 +17,15 @@ interface Props {
   measurementType?: string;
   onExerciseClick?: () => void;
   onUpdate: () => void;
+  readOnly?: boolean;
 }
 
 export function ExerciseGroup({
   group,
   measurementType,
   onExerciseClick,
-  onUpdate
+  onUpdate,
+  readOnly = false
 }: Props) {
   return (
     <div className="bg-bg-tertiary/30 rounded-2xl p-4 border border-border-primary">
@@ -57,6 +59,7 @@ export function ExerciseGroup({
               index={idx}
               measurementType={measurementType}
               onUpdate={onUpdate}
+              readOnly={readOnly}
             />
           </div>
         ))}

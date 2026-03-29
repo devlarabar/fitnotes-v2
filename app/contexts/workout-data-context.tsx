@@ -26,7 +26,7 @@ interface WorkoutDataContextType {
 const WorkoutDataContext = createContext<WorkoutDataContextType | undefined>(undefined);
 
 export function WorkoutDataProvider({ children }: { children: React.ReactNode }) {
-  const { user } = useUser();
+  const { effectiveUserId } = useUser();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [weightUnits, setWeightUnits] = useState<WeightUnit[]>([]);
@@ -67,8 +67,8 @@ export function WorkoutDataProvider({ children }: { children: React.ReactNode })
       if (distanceUnitsRes.data) setDistanceUnits(distanceUnitsRes.data);
       if (measurementTypesRes.data) setMeasurementTypes(measurementTypesRes.data);
 
-      // Fetch user-specific data if user is logged in
-      if (user?.id) {
+      // Fetch user-specific data if effective user is resolved
+      if (effectiveUserId) {
         const [workoutsRes, commentsRes] = await Promise.all([
           supabase
             .from('workouts')
@@ -77,13 +77,13 @@ export function WorkoutDataProvider({ children }: { children: React.ReactNode })
               distance, distance_unit, time, comment, is_pr,
               exercises(name), categories(name), weight_units(name), distance_units(name)
             `)
-            .eq('user_id', user.id)
+            .eq('user_id', effectiveUserId)
             .order('date', { ascending: false })
             .order('id', { ascending: false }),
           supabase
             .from('comments')
             .select('*')
-            .eq('user_id', user.id)
+            .eq('user_id', effectiveUserId)
         ]);
 
         if (workoutsRes.data) {
@@ -129,7 +129,7 @@ export function WorkoutDataProvider({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     fetchData();
-  }, [user?.id]);
+  }, [effectiveUserId]);
 
   const addWorkout = (workout: Workout) => {
     setWorkouts(prev => [workout, ...prev]);

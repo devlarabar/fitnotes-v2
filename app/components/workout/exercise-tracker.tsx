@@ -33,15 +33,24 @@ interface Props {
     date: Date,
   ) => Promise<number | null>;
   onBack: () => void;
+  canWrite?: boolean;
 }
 
-export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
-  const { user } = useUser();
+export function ExerciseTracker({
+  exercise,
+  date,
+  onSaveSet,
+  onBack,
+  canWrite = true
+}: Props) {
+  const { effectiveUserId } = useUser();
   const {
     weightUnits, distanceUnits, workouts,
     deleteWorkout, updateWorkout,
   } = useWorkoutData();
-  const [activeTab, setActiveTab] = useState<'sets' | 'history' | 'progress'>('sets');
+  const [activeTab, setActiveTab] = useState<'sets' | 'history' | 'progress'>(
+    canWrite ? 'sets' : 'history'
+  );
   const [setDate, setSetDate] = useState(date);
   const [currentSet, setCurrentSet] = useState<LocalSet>({
     weight: 0,
@@ -72,13 +81,13 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
 
   const fetchLastSetData = async () => {
     try {
-      if (!user?.id) return;
+      if (!effectiveUserId) return;
 
       const { data, error } = await supabase
         .from('workouts')
         .select('weight, weight_unit, reps, distance, distance_unit, time')
         .eq('exercise', exercise.id)
-        .eq('user_id', user.id)
+        .eq('user_id', effectiveUserId)
         .order('date', { ascending: false })
         .order('id', { ascending: false })
         .limit(1)
@@ -236,15 +245,17 @@ export function ExerciseTracker({ exercise, date, onSaveSet, onBack }: Props) {
 
       <Card className="p-0 overflow-hidden">
         <div className="flex border-b border-border-primary">
-          <button
-            onClick={() => setActiveTab('sets')}
-            className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === 'sets'
-              ? 'text-accent-secondary border-b-2 border-accent-primary'
-              : 'text-text-dim hover:text-text-secondary hover:cursor-pointer'
-              }`}
-          >
-            Track Set
-          </button>
+          {canWrite && (
+            <button
+              onClick={() => setActiveTab('sets')}
+              className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === 'sets'
+                ? 'text-accent-secondary border-b-2 border-accent-primary'
+                : 'text-text-dim hover:text-text-secondary hover:cursor-pointer'
+                }`}
+            >
+              Track Set
+            </button>
+          )}
           <button
             onClick={() => setActiveTab('history')}
             className={`flex-1 py-3 text-sm font-bold transition-colors ${activeTab === 'history'

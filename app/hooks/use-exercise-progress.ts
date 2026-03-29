@@ -10,19 +10,19 @@ export function useExerciseProgress(
   exerciseId: number,
   measurementType?: string
 ) {
-  const { user } = useUser();
+  const { effectiveUserId } = useUser();
   const [history, setHistory] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.id) {
+    if (effectiveUserId) {
       fetchHistory();
     }
-  }, [exerciseId, user?.id]);
+  }, [exerciseId, effectiveUserId]);
 
   const fetchHistory = async () => {
     try {
-      if (!user?.id) {
+      if (!effectiveUserId) {
         setLoading(false);
         return;
       }
@@ -42,7 +42,7 @@ export function useExerciseProgress(
           distance_units(name)
         `)
         .eq('exercise', exerciseId)
-        .eq('user_id', user.id)
+        .eq('user_id', effectiveUserId)
         .order('date', { ascending: true });
 
       if (error) throw error;

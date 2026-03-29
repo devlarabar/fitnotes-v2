@@ -4,6 +4,8 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useWorkoutData } from '@/app/contexts/workout-data-context';
 import { useWorkout } from '@/app/hooks/use-workout';
+import { useUser } from '@/app/contexts/user-context';
+import { useTrainerAccess } from '@/app/hooks/use-trainer-access';
 import { Exercise } from '@/app/lib/schema';
 import { DayNavigation } from '@/app/components/workout/day-navigation';
 import { DayWorkouts } from '@/app/components/workout/day-workouts';
@@ -12,12 +14,16 @@ import { DayComment } from '@/app/components/day-comment';
 import { Plus } from 'lucide-react';
 import { Button, Card } from '@/app/components/ui';
 import { CenteredSpinner } from '@/app/components/ui/spinner';
+import { toast } from 'sonner';
 
 function WorkoutPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [viewDate, setViewDate] = useState(new Date());
   const [trackingExercise, setTrackingExercise] = useState<Exercise | null>(null);
+
+  const { user, trainee, hasTrainer } = useUser();
+  const isTrainer = user?.role === 'trainer';
 
   const {
     exercises,
@@ -30,6 +36,18 @@ function WorkoutPageContent() {
   } = useWorkoutData();
 
   const { saveSetToSupabase } = useWorkout();
+
+  const formatDate = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const viewDateStr = formatDate(viewDate);
+
+  const trainerAccess = useTrainerAccess(viewDateStr);
+  const canWrite = !isTrainer || trainerAccess.hasAccess;
 
   const getCommentForDate = (date: string) => {
     return dayComments.get(date) || null;
@@ -53,14 +71,6 @@ function WorkoutPageContent() {
     }
   }, [searchParams, exercises]);
 
-  const formatDate = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  const viewDateStr = formatDate(viewDate);
   const dayComment = getCommentForDate(viewDateStr);
 
   const getGroupedWorkouts = (date: string) => {
@@ -101,13 +111,33 @@ function WorkoutPageContent() {
     set: any,
     date: Date
   ) => {
-    return await saveSetToSupabase(
-      exerciseId, categoryId, set, date
-    );
+    return await saveSetToSupabase(exerciseId, categoryId, set, date);
+  };
+
+  const handleToggleTrainerAccess = async () => {
+    try {
+      await trainerAccess.toggle();
+    } catch {
+      toast.error('Failed to update trainer access');
+    }
   };
 
   if (loading) {
     return <CenteredSpinner size="lg" />;
+  }
+
+  // Trainer with no trainee assigned yet
+  if (isTrainer && !trainee) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 space-y-3">
+        <p className="text-text-muted text-center">
+          No trainee assigned to your account yet.
+        </p>
+        <p className="text-text-subtle text-sm text-center">
+          Ask your admin to set up the trainer relationship.
+        </p>
+      </div>
+    );
   }
 
   if (trackingExercise) {
@@ -116,6 +146,7 @@ function WorkoutPageContent() {
         exercise={trackingExercise}
         date={viewDate}
         onSaveSet={handleSaveSet}
+        canWrite={canWrite}
         onBack={() => {
           setTrackingExercise(null);
           const params = new URLSearchParams();
@@ -154,10 +185,47 @@ function WorkoutPageContent() {
         onToday={handleToday}
       />
 
+      {/* Trainer write access toggle — only shown to trainees who have a trainer */}
+      {!isTrainer && hasTrainer && (
+        <div className={`flex items-center justify-between px-5 py-4
+          bg-bg-secondary rounded-2xl border border-border-secondary`}
+        >
+          <div>
+            <p className="text-sm font-bold text-text-primary">
+              Trainer write access
+            </p>
+            <p className="text-xs text-text-muted mt-0.5">
+              Allow your trainer to edit this day
+            </p>
+          </div>
+          <button
+            onClick={handleToggleTrainerAccess}
+            disabled={trainerAccess.loading || trainerAccess.toggling}
+            aria-checked={trainerAccess.hasAccess}
+            role="switch"
+            className={`relative inline-flex h-6 w-11 shrink-0 items-center
+              rounded-full transition-colors focus:outline-none
+              disabled:opacity-50 ${
+              trainerAccess.hasAccess
+                ? 'bg-accent-primary'
+                : 'bg-bg-tertiary border border-border-primary'
+            }`}
+          >
+            <span
+              className={`inline-block h-4 w-4 rounded-full bg-white
+                shadow transition-transform duration-200 ${
+                trainerAccess.hasAccess ? 'translate-x-6' : 'translate-x-1'
+              }`}
+            />
+          </button>
+        </div>
+      )}
+
       <DayComment
         date={viewDateStr}
         initialComment={dayComment}
         onUpdate={refetchHistory}
+        readOnly={!canWrite}
       />
 
       {hasWorkoutsForDay ? (
@@ -172,21 +240,29 @@ function WorkoutPageContent() {
             if (exercise) setTrackingExercise(exercise);
           }}
           onUpdate={refetchHistory}
+          readOnly={!canWrite}
         />
       ) : (
-        <Card className="py-20 flex flex-col items-center justify-center text-center border-dashed border-2 bg-transparent">
+        <Card className={`py-20 flex flex-col items-center justify-center
+          text-center border-dashed border-2 bg-transparent`}>
           <p className="text-text-muted max-w-50">
             No workouts recorded for this day
           </p>
-          <Button variant="secondary" onClick={handleOpenSelector} className="mt-6">
-            Browse Exercises
-          </Button>
+          {canWrite && (
+            <Button variant="secondary" onClick={handleOpenSelector} className="mt-6">
+              Browse Exercises
+            </Button>
+          )}
         </Card>
       )}
 
-      {hasWorkoutsForDay && (
+      {hasWorkoutsForDay && canWrite && (
         <div className="flex justify-center">
-          <Button variant="primary" onClick={handleOpenSelector} className="w-14 h-14 rounded-full">
+          <Button
+            variant="primary"
+            onClick={handleOpenSelector}
+            className="w-14 h-14 rounded-full"
+          >
             <Plus size={24} />
           </Button>
         </div>
@@ -202,4 +278,3 @@ export default function WorkoutRoute() {
     </Suspense>
   );
 }
-

@@ -19,6 +19,7 @@ interface Props {
   onUpdate?: () => void;
   showTitle?: boolean;
   onExerciseClick: (exerciseId: number) => void;
+  readOnly?: boolean;
 }
 
 export function WorkoutDayView({
@@ -27,7 +28,8 @@ export function WorkoutDayView({
   exercises,
   onUpdate,
   showTitle = true,
-  onExerciseClick
+  onExerciseClick,
+  readOnly = false
 }: Props) {
   return (
     <Card className="p-6">
@@ -54,6 +56,7 @@ export function WorkoutDayView({
               measurementType={measurementType}
               onExerciseClick={() => onExerciseClick(group.exercise.id)}
               onUpdate={() => onUpdate?.()}
+              readOnly={readOnly}
             />
           );
         })}

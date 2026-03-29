@@ -22,6 +22,7 @@ interface Props {
   onOpenSelector?: () => void;
   showEmptyState?: boolean;
   onExerciseClick: (exerciseId: number) => void;
+  readOnly?: boolean;
 }
 
 export function DayWorkouts({
@@ -33,19 +34,22 @@ export function DayWorkouts({
   onUpdate,
   onOpenSelector,
   showEmptyState = false,
-  onExerciseClick
+  onExerciseClick,
+  readOnly = false
 }: Props) {
 
   if (groupedWorkouts.length === 0 && showEmptyState) {
     return (
-      <Card className={`py-20 flex flex-col items-center justify-center 
+      <Card className={`py-20 flex flex-col items-center justify-center
         text-center border-dashed border-2 bg-transparent`}>
         <p className="text-text-muted max-w-50">
           No workouts recorded for this day
         </p>
-        <Button variant="secondary" onClick={onOpenSelector} className="mt-6">
-          Browse Exercises
-        </Button>
+        {!readOnly && (
+          <Button variant="secondary" onClick={onOpenSelector} className="mt-6">
+            Browse Exercises
+          </Button>
+        )}
       </Card>
     );
   }
@@ -62,6 +66,7 @@ export function DayWorkouts({
       onUpdate={onUpdate}
       showTitle={false}
       onExerciseClick={onExerciseClick}
+      readOnly={readOnly}
     />
   );
 }
