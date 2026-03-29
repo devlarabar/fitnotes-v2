@@ -31,7 +31,7 @@ interface LocalWorkout {
 }
 
 export function useWorkout() {
-  const { user } = useUser();
+  const { user, effectiveUserId } = useUser();
   const { addWorkout: addWorkoutToCache, deleteWorkout: deleteWorkoutFromCache } = useWorkoutData();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -140,14 +140,14 @@ export function useWorkout() {
   ): Promise<number | null> => {
     try {
       const dateStr = formatDate(date);
-      if (!user?.id) {
+      if (!effectiveUserId) {
         throw new Error('User not authenticated');
       }
-      
+
       // Check if this is a PR
       const isPR = await checkIsPR(
         exerciseId,
-        user.id,
+        effectiveUserId,
         set.weight,
         set.reps,
         set.distance,
@@ -166,7 +166,7 @@ export function useWorkout() {
         time: set.time || null,
         comment: null,
         is_pr: isPR,
-        user_id: user.id
+        user_id: effectiveUserId
       };
 
       // Optimistically add to cache with temporary ID
@@ -183,7 +183,7 @@ export function useWorkout() {
         time: workoutData.time || undefined,
         comment: workoutData.comment || undefined,
         is_pr: workoutData.is_pr || undefined,
-        user_id: user.id
+        user_id: effectiveUserId
       };
       addWorkoutToCache(tempWorkout);
 
@@ -218,9 +218,9 @@ export function useWorkout() {
           categories: (data as any).categories ? { name: (data as any).categories.name } : undefined,
           weight_units: (data as any).weight_units ? { name: (data as any).weight_units.name } : undefined,
           distance_units: (data as any).distance_units ? { name: (data as any).distance_units.name } : undefined,
-          user_id: user.id
+          user_id: effectiveUserId
         };
-        
+
         // Remove temp and add real
         deleteWorkoutFromCache(tempWorkout.id);
         addWorkoutToCache(realWorkout);

@@ -12,10 +12,11 @@ interface Props {
   date: string; // YYYY-MM-DD format
   initialComment: DayCommentType | null;
   onUpdate: () => void;
+  readOnly?: boolean;
 }
 
-export function DayComment({ date, initialComment, onUpdate }: Props) {
-  const { user } = useUser();
+export function DayComment({ date, initialComment, onUpdate, readOnly = false }: Props) {
+  const { user, effectiveUserId } = useUser();
   const { addComment, updateComment, deleteComment } = useWorkoutData();
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState('');
@@ -69,7 +70,7 @@ export function DayComment({ date, initialComment, onUpdate }: Props) {
       }
     } else {
       // Create new - optimistic add
-      if (!user?.id) {
+      if (!effectiveUserId) {
         toast.error('User not authenticated');
         setSaving(false);
         return;
@@ -81,7 +82,7 @@ export function DayComment({ date, initialComment, onUpdate }: Props) {
       try {
         const { data, error } = await supabase
           .from('comments')
-          .insert({ date, comment: editValue, user_id: user.id })
+          .insert({ date, comment: editValue, user_id: effectiveUserId })
           .select('id')
           .single();
 
@@ -186,18 +187,25 @@ export function DayComment({ date, initialComment, onUpdate }: Props) {
           </div>
         ) : initialComment ? (
           <div
-            className="flex items-start gap-3 cursor-pointer h-full"
-            onClick={handleStartEdit}
+            className={`flex items-start gap-3 h-full ${
+              readOnly ? '' : 'cursor-pointer'
+            }`}
+            onClick={readOnly ? undefined : handleStartEdit}
           >
             <MessageSquare size={16} className="text-text-dim mt-0.5 shrink-0" />
             <p className="flex-1 text-sm text-text-secondary italic">
               {initialComment.comment}
             </p>
           </div>
+        ) : readOnly ? (
+          <div className="w-full h-full flex items-center justify-center gap-2 text-text-faint">
+            <MessageSquare size={16} />
+            <span className="text-sm">No day note</span>
+          </div>
         ) : (
           <button
             onClick={handleStartEdit}
-            className={`w-full h-full flex items-center justify-center 
+            className={`w-full h-full flex items-center justify-center
               gap-2 text-text-dim hover:text-text-secondary transition-colors`}
           >
             <MessageSquare size={16} />

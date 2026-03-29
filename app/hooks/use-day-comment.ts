@@ -4,19 +4,19 @@ import { DayComment } from '@/app/lib/schema';
 import { useUser } from '@/app/contexts/user-context';
 
 export function useDayComment(date: string) {
-  const { user } = useUser();
+  const { effectiveUserId } = useUser();
   const [comment, setComment] = useState<DayComment | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.id) {
+    if (effectiveUserId) {
       fetchComment();
     }
-  }, [date, user?.id]);
+  }, [date, effectiveUserId]);
 
   const fetchComment = async () => {
     try {
-      if (!user?.id) {
+      if (!effectiveUserId) {
         setLoading(false);
         return;
       }
@@ -26,7 +26,7 @@ export function useDayComment(date: string) {
         .from('comments')
         .select('*')
         .eq('date', date)
-        .eq('user_id', user.id)
+        .eq('user_id', effectiveUserId)
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;

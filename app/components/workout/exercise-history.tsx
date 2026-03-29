@@ -16,19 +16,19 @@ interface GroupedByDate {
 }
 
 export function ExerciseHistory({ exerciseId }: Props) {
-  const { user } = useUser();
+  const { effectiveUserId } = useUser();
   const [history, setHistory] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.id) {
+    if (effectiveUserId) {
       fetchHistory();
     }
-  }, [exerciseId, user?.id]);
+  }, [exerciseId, effectiveUserId]);
 
   const fetchHistory = async () => {
     try {
-      if (!user?.id) {
+      if (!effectiveUserId) {
         setLoading(false);
         return;
       }
@@ -51,7 +51,7 @@ export function ExerciseHistory({ exerciseId }: Props) {
           distance_units(name)
         `)
         .eq('exercise', exerciseId)
-        .eq('user_id', user.id)
+        .eq('user_id', effectiveUserId)
         .order('date', { ascending: false })
         .order('id', { ascending: false });
 

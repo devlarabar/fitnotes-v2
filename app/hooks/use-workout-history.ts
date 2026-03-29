@@ -6,20 +6,20 @@ import { Workout, DayComment } from '@/app/lib/schema';
 import { useUser } from '@/app/contexts/user-context';
 
 export function useWorkoutHistory() {
-  const { user, loading: userLoading } = useUser();
+  const { effectiveUserId, loading: userLoading } = useUser();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [dayComments, setDayComments] = useState<Map<string, DayComment>>(new Map());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!userLoading) {
-      if (user?.id) {
+      if (effectiveUserId) {
         fetchWorkouts();
       } else {
         setLoading(false);
       }
     }
-  }, [user?.id, userLoading]);
+  }, [effectiveUserId, userLoading]);
 
   const fetchWorkouts = async () => {
     try {
@@ -37,7 +37,7 @@ export function useWorkoutHistory() {
         }
       }
 
-      if (!user?.id) {
+      if (!effectiveUserId) {
         setLoading(false);
         return;
       }
@@ -64,13 +64,13 @@ export function useWorkoutHistory() {
             weight_units(name),
             distance_units(name)
           `)
-          .eq('user_id', user.id)
+          .eq('user_id', effectiveUserId)
           .order('date', { ascending: false })
           .order('id', { ascending: false }),
         supabase
           .from('comments')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', effectiveUserId)
       ]);
 
       const { data, error } = workoutsResult;
